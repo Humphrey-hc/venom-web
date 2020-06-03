@@ -18,8 +18,6 @@ class GoodsEditModal extends Component {
             disable : false,
             goodsVO: {},
             channelList: [],
-            tagId: undefined,
-            parentTagId: undefined,
         }
     }
 
@@ -48,15 +46,15 @@ class GoodsEditModal extends Component {
         }
         this.setState({disable:true});
 
-      GoodsAPI.saveOrUpdate(this.state.goodsVO)
-        .then((res) => {
-            let flag = commonMessage(res);
-            this.setState({disable:false});
-            if (flag) {
-                this.setState({modalVisible : false});
-                this.props.refresh();
-            }
-        });
+      GoodsAPI.saveOrUpdateGoods(this.state.goodsVO)
+          .then((res) => {
+              let flag = commonMessage(res);
+              this.setState({disable:false});
+              if (flag) {
+                  this.setState({modalVisible : false});
+                  this.props.refresh();
+              }
+          });
     };
 
     onCancel = () => {

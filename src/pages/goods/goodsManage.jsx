@@ -14,27 +14,31 @@ class GoodsManage extends Component {
         this.state = {
             page: 1,
             channelList:[
-              {"code":"1", "name":"严选内购"},
-              {"code":"2", "name":"大萌严选"},
-              {"code":"3", "name":"其他"},
+              {"channelCode":1, "channelName":"严选内购"},
+              {"channelCode":2, "channelName":"大萌严选"},
+              {"channelCode":3, "channelName":"其他"},
             ],
             channelCode: undefined,
-            id: undefined,
-            name: undefined,
+            goodsId: undefined,
+            goodsName: undefined,
             goodsPage: {}
         };
+    }
+
+    componentDidMount() {
+      this.handleSearch(this.state.page);
     }
 
     handleChannelCodeChange = (value) => {
         this.setState({channelCode: value});
     };
 
-    handleNameChange = (e) => {
-        this.setState({name : e.target.value});
+    handleGoodsNameChange = (e) => {
+        this.setState({goodsName : e.target.value});
     };
 
-    handleIdChange = (e) => {
-        this.setState({id : e.target.value});
+    handleGoodsIdChange = (e) => {
+        this.setState({goodsId : e.target.value});
     };
 
     refresh = () => {
@@ -42,17 +46,17 @@ class GoodsManage extends Component {
     };
 
     handleSearch = (page) => {
-      GoodsAPI.findByPage({
-            id : this.state.id,
-            name : this.state.name,
+      GoodsAPI.getGoodsByPage({
+            goodsId : this.state.goodsId,
+            goodsName : this.state.goodsName,
             channelCode : this.state.channelCode,
-            pageNo: page,
+            pageNum: page,
             pageSize : 10
         }).then((res) => {
             if (res.data.success) {
                 this.setState({
                     goodsPage : res.data.data,
-                    page : res.data.data.currentIndex,
+                    page : res.data.data.current,
                 });
             }
         });
@@ -60,10 +64,10 @@ class GoodsManage extends Component {
 
     handleDelete = (id) => {
         confirm({
-            title: '删除线索',
+            title: '删除商品',
             content: <div><p>是否确认删除?</p></div>,
             onOk : () => {
-              GoodsAPI.deleteById({id : id}).then((res) => {
+              GoodsAPI.deleteGoods(id).then((res) => {
                     if (res.data.success) {
                         notification.success({message: "操作成功", description: "删除成功"});
                         setTimeout(() => {this.handleSearch(this.state.page);});
@@ -79,23 +83,23 @@ class GoodsManage extends Component {
 
     render() {
         let channelList = this.state.channelList.map((channel) => {
-            return (<Option value={channel.code} key={channel.code}>{channel.name}</Option>)
+            return (<Option value={channel.channelCode} key={channel.channelCode}>{channel.channelName}</Option>)
         });
         let goodsPage = this.state.goodsPage;
 
         let columns = [
             { title : "ID", key : "id", dataIndex : "id", width: "50px"},
-            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px"},
-            { title : "渠道", key : "channelName", dataIndex : "channelName", width: "150px"},
-            { title : "库存", key : "stockNum", dataIndex : "stockNum", width: "100px"},
-            { title : "重量", key : "weight", dataIndex : "weight", width: "100px"},
-            { title : "成本", key : "buyingPrice", dataIndex : "buyingPrice", width: "200px"},
-            { title : "指导售价", key : "guideSellingPrice", dataIndex : "guideSellingPrice", width: "200px"},
-            { title : "预估利润", key : "predictProfit", dataIndex : "predictProfit", width: "200px"},
-            { title : "一区邮费", key : "postageOne", dataIndex : "postageOne", width: "200px"},
-            { title : "二区邮费", key : "postageTow", dataIndex : "postageTow", width: "200px"},
-            { title : "三区邮费", key : "predictProfit", dataIndex : "predictProfit", width: "200px"},
-            { title : "操作", key : "operate", dataIndex : "", width: "100px",
+            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "250px"},
+            { title : "渠道", key : "channelName", dataIndex : "channelName", width: "200px"},
+            { title : "库存", key : "stockNum", dataIndex : "stockNum", width: "80px", align:"center"},
+            { title : "重量", key : "weight", dataIndex : "weight", width: "80px", align:"center"},
+            { title : "成本", key : "buyingPrice", dataIndex : "buyingPrice", width: "120px"},
+            { title : "指导售价", key : "guideSellingPrice", dataIndex : "guideSellingPrice", width: "120px"},
+            { title : "预估利润", key : "predictProfit", dataIndex : "predictProfit", width: "120px"},
+            { title : "一区邮费", key : "postageOne", dataIndex : "postageOne", width: "120px"},
+            { title : "二区邮费", key : "postageTow", dataIndex : "postageTow", width: "120px"},
+            { title : "三区邮费", key : "postageThree", dataIndex : "postageThree", width: "120px"},
+            { title : "操作", key : "operate", dataIndex : "", width: "150px",
                 render : (text, record) => {
                     return (
                         <div>
@@ -111,9 +115,9 @@ class GoodsManage extends Component {
         ];
 
         let pagination = {
-            total : goodsPage.totalNumber,
-            current : goodsPage.currentIndex,
-            pageSize : goodsPage.pageSize,
+            total : goodsPage.total,
+            current : goodsPage.current,
+            pageSize : goodsPage.size,
             showTotal: total => `共 ${total} 条记录`,
             onChange: (page) => {
                 this.handleSearch(page);
@@ -131,9 +135,9 @@ class GoodsManage extends Component {
                     <Row style={{paddingTop: 24}}>
                         <Col span={15}>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入商品id" allowClear
-                                   value={this.state.id} onChange={this.handleIdChange}/>
+                                   value={this.state.goodsId} onChange={this.handleGoodsIdChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入商品名称" allowClear
-                                   value={this.state.name} onChange={this.handleNameChange}/>
+                                   value={this.state.goodsName} onChange={this.handleGoodsNameChange}/>
                             <Select style={{width : 200, marginRight : 10}}  value={this.state.channelCode} allowClear={true}
                                   onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
                               {channelList}
@@ -150,7 +154,7 @@ class GoodsManage extends Component {
                     </Row>
                     <Row style={{paddingTop: 16}}>
                       <Col span={24}>
-                        <Table columns={columns} dataSource={goodsPage.items} pagination={pagination}
+                        <Table columns={columns} dataSource={goodsPage.records} pagination={pagination}
                                rowKey={record => record.id} bordered
                         />
                       </Col>

@@ -3,18 +3,15 @@ import queryString from 'qs';
 
 const GoodsAPI = {
 
-    saveOrUpdate : (param) => {
+    saveOrUpdateGoods : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/saveOrUpdate.json`,
+            `${SERVER_URL}/goods/saveOrUpdateGoods`,
             param
         )
     },
 
-    getById : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getById.json`,
-            queryString.stringify(param),
-        )
+    deleteGoods : (param) => {
+        return axios.delete(`${SERVER_URL}/goods/deleteGoods/${param}`)
     },
 
     deleteById : (param) => {
@@ -24,9 +21,9 @@ const GoodsAPI = {
         )
     },
 
-    findByPage : (param) => {
+    getGoodsByPage : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/findByPage.json`,
+            `${SERVER_URL}/goods/getGoodsByPage`,
             queryString.stringify(param),
         )
     },
