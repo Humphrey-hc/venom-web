@@ -3,9 +3,9 @@ import queryString from 'qs';
 
 const CustomerAPI = {
 
-    saveOrUpdate : (param) => {
+    saveOrUpdateCustomer : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/saveOrUpdate.json`,
+            `${SERVER_URL}/customer/saveOrUpdateCustomer`,
             param
         )
     },
@@ -17,25 +17,27 @@ const CustomerAPI = {
         )
     },
 
-    deleteById : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/deleteById.json`,
-            queryString.stringify(param),
-        )
+    deleteCustomer : (param) => {
+        return axios.delete(`${SERVER_URL}/customer/deleteCustomer/${param}`)
     },
 
     findByPage : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/findByPage.json`,
+            `${SERVER_URL}/customer/getCustomerByPage`,
             queryString.stringify(param),
         )
     },
 
-    getAllBizType : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getAllBizType.json`,
-            queryString.stringify(param),
-        )
+    getProvince : () => {
+      return axios.get(`${SERVER_URL}/area/getProvince`)
+    },
+
+    getCitiesByProvinceCode : (param) => {
+      return axios.get(`${SERVER_URL}/area/getCitiesByProvinceCode/${param}`)
+    },
+
+    getDistrictsByCityCode : (param) => {
+      return axios.get(`${SERVER_URL}/area/getDistrictsByCityCode/${param}`)
     },
 
 };

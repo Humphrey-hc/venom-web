@@ -12,10 +12,14 @@ class CustomerManage extends Component {
     constructor(props) {
       super(props);
         this.state = {
-            channelList:[],
+            channelList:[
+              {"code":"1", "name":"严选内购"},
+              {"code":"2", "name":"大萌严选"},
+              {"code":"3", "name":"其他"},
+            ],
             page: 1,
             channelCode: undefined,
-            id: undefined,
+            customerId: undefined,
             name: undefined,
             weChatName: undefined,
             mobile: undefined,
@@ -23,8 +27,12 @@ class CustomerManage extends Component {
         };
     }
 
-    handleIdChange = (e) => {
-      this.setState({id : e.target.value});
+    componentDidMount() {
+      this.handleSearch(this.state.page);
+    }
+
+    handleCustomerIdChange = (e) => {
+      this.setState({customerId : e.target.value});
     };
 
     handleNameChange = (e) => {
@@ -45,17 +53,18 @@ class CustomerManage extends Component {
 
     handleSearch = (page) => {
       CustomerAPI.findByPage({
-            id : this.state.id,
+            customerId : this.state.customerId,
             name : this.state.name,
             weChatName : this.state.weChatName,
             mobile : this.state.mobile,
-            pageNo: page,
+            pageNum: page,
             pageSize : 10
         }).then((res) => {
             if (res.data.success) {
+              console.log("data", res.data.data);
                 this.setState({
                     customerPage : res.data.data,
-                    page : res.data.data.currentIndex,
+                    page : res.data.data.current,
                 });
             }
         });
@@ -66,7 +75,7 @@ class CustomerManage extends Component {
             title: '删除线索',
             content: <div><p>是否确认删除?</p></div>,
             onOk : () => {
-              CustomerAPI.deleteById({id : id}).then((res) => {
+              CustomerAPI.deleteCustomer(id).then((res) => {
                     if (res.data.success) {
                         notification.success({message: "操作成功", description: "删除成功"});
                         setTimeout(() => {this.handleSearch(this.state.page);});
@@ -94,7 +103,7 @@ class CustomerManage extends Component {
             { title : "省份", key : "provinceName", dataIndex : "provinceName", width: "150px"},
             { title : "城市", key : "cityName", dataIndex : "cityName", width: "150px"},
             { title : "地区", key : "districtName", dataIndex : "districtName", width: "150px"},
-            { title : "操作", key : "operate", dataIndex : "", width: "100px",
+            { title : "操作", key : "operate", dataIndex : "", width: "150px",
                 render : (text, record) => {
                     return (
                         <div>
@@ -110,9 +119,9 @@ class CustomerManage extends Component {
         ];
 
         let pagination = {
-            total : customerPage.totalNumber,
-            current : customerPage.currentIndex,
-            pageSize : customerPage.pageSize,
+            total : customerPage.total,
+            current : customerPage.current,
+            pageSize : customerPage.size,
             showTotal: total => `共 ${total} 条记录`,
             onChange: (page) => {
                 this.handleSearch(page);
@@ -130,7 +139,7 @@ class CustomerManage extends Component {
                     <Row style={{paddingTop: 24}}>
                         <Col span={20}>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户id" allowClear
-                                   value={this.state.id} onChange={this.handleIdChange}/>
+                                   value={this.state.id} onChange={this.handleCustomerIdChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户名称" allowClear
                                    value={this.state.name} onChange={this.handleNameChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户微信名称" allowClear
@@ -141,15 +150,15 @@ class CustomerManage extends Component {
                         </Col>
                         <Col span={4} style={{textAlign: "right"}}>
                             <CustomerEditModal type="add"
-                                            item={undefined}
-                                            key={0}
-                                            channelList={channelList}
-                                            refresh={this.refresh.bind(this)} />
+                                              item={undefined}
+                                              key={0}
+                                              channelList={channelList}
+                                              refresh={this.refresh.bind(this)} />
                         </Col>
                     </Row>
                     <Row style={{paddingTop: 16}}>
                       <Col span={24}>
-                        <Table columns={columns} dataSource={customerPage.items} pagination={pagination}
+                        <Table columns={columns} dataSource={customerPage.records} pagination={pagination}
                                rowKey={record => record.id} bordered
                         />
                       </Col>

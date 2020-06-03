@@ -38,30 +38,13 @@ class GoodsEditModal extends Component {
         }
 
         //校验
-        if (!this.state.goodsVO.bizId) {
-            notification.error({message : "保存失败", description : "业务类型必选"});
+        if (!this.state.goodsVO.goodsName) {
+            notification.error({message : "保存失败", description : "商品名称必填"});
             return;
         }
-        if (!this.state.goodsVO.name) {
-            notification.error({message : "保存失败", description : "姓名必填"});
-            return;
-        }
-        if (this.state.goodsVO.name.length > 20) {
-            notification.error({message : "保存失败", description : "姓名长度不能大于20"});
-            return;
-        }
-        if (!this.state.goodsVO.phone) {
-            notification.error({message : "保存失败", description : "手机号必填"});
-            return;
-        }
-        if (! (this.state.goodsVO.phone.match(phoneRegx)) ) {
-            notification.error({message : "保存失败", description : "请填写有效手机号"});
-            return;
-        }
-
-        if (this.state.goodsVO.remark && this.state.clueVO.remark.length > 200) {
-            notification.error({message : "保存失败", description : "备注长度不能大于200"});
-            return;
+        if (!this.state.goodsVO.channelCode) {
+          notification.error({message : "保存失败", description : "渠道必选"});
+          return;
         }
         this.setState({disable:true});
 
@@ -80,8 +63,8 @@ class GoodsEditModal extends Component {
         this.setState({modalVisible : false});
     };
 
-    handleNameChange = (e) => {
-        this.state.goodsVO.name = e.target.value;
+    handleGoodsNameChange = (e) => {
+        this.state.goodsVO.goodsName = e.target.value;
         this.setState({goodsVO : deepClone(this.state.goodsVO)});
     };
 
@@ -128,8 +111,8 @@ class GoodsEditModal extends Component {
             <Modal title={title} width={700} visible={this.state.modalVisible}
                    onOk={this.onOk} onCancel={this.onCancel} key={this.props.key}>
               <FormItem label="商品名" {...formItemLayout} required={true}>
-                    <Input style={{width : 500}} value={this.state.goodsVO.name}
-                           onChange={this.handleNameChange} placeholder="请输入商品名"/>
+                    <Input style={{width : 500}} value={this.state.goodsVO.goodsName}
+                           onChange={this.handleGoodsNameChange} placeholder="请输入商品名"/>
                 </FormItem>
                 <FormItem label="渠道" {...formItemLayout} required={true}>
                     <Select style={{width : 500, marginRight : 10}}  value={this.state.goodsVO.channelCode} allowClear={true}
@@ -139,11 +122,11 @@ class GoodsEditModal extends Component {
                 </FormItem>
                 <FormItem label="起始库存数" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {0} value={this.state.goodsVO.stockNum}
-                           onChange={this.handleStockNumChange} placeholder="请输起始库存数"/>
+                           onChange={this.handleStockNumChange} placeholder="请输入起始库存数"/>
                 </FormItem>
                <FormItem label="重量(kg)" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.goodsVO.weight}
-                           onChange={this.handleWeightChange} placeholder="请输起始库存数"/>
+                           onChange={this.handleWeightChange} placeholder="请输入重量"/>
                 </FormItem>
                <FormItem label="进货价(元)" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.goodsVO.buyingPrice}
@@ -151,7 +134,7 @@ class GoodsEditModal extends Component {
                 </FormItem>
                 <FormItem label="指导售价(元)" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.goodsVO.guideSellingPrice}
-                                 onChange={this.handleGuideSellingPricePriceChange} placeholder="指导售价"/>
+                                 onChange={this.handleGuideSellingPricePriceChange} placeholder="请输入指导售价"/>
                 </FormItem>
             </Modal>
         </span>)

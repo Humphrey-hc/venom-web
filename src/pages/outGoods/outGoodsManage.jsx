@@ -13,7 +13,11 @@ class OutGoodsManage extends Component {
       super(props);
         this.state = {
             page: 1,
-            channelList:[],
+            channelList:[
+              {"code":"1", "name":"严选内购"},
+              {"code":"2", "name":"大萌严选"},
+              {"code":"3", "name":"其他"},
+            ],
             channelCode: undefined,
             outGoodsId: undefined,
             goodsId: undefined,
