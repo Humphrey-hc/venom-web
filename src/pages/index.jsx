@@ -66,7 +66,7 @@ class Index extends Component {
             </Row>
           </Header>
           <Layout>
-            <Sider width={200} className="site-layout-background">
+            <Sider width={150} className="site-layout-background">
               <Menu
                 mode="inline"
                 defaultSelectedKeys={['1']}
