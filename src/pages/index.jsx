@@ -1,12 +1,9 @@
 import React, {Component} from "react";
+import { Link } from 'umi';
 import styles from './index.less';
 import {Layout, Menu, Row, Col} from 'antd';
 import {
   UserOutlined,
-  LaptopOutlined,
-  NotificationOutlined,
-  AppstoreTwoTone,
-  InsertRowAboveOutlined,
   InsertRowBelowOutlined,
   AppstoreAddOutlined,
   AppstoreOutlined

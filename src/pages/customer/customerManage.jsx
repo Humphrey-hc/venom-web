@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import {Button, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal} from "antd";
+import {Col, Input, Row, Table, Select, notification, ConfigProvider, Modal} from "antd";
 import CustomerAPI from "../../components/api/CustomerAPI";
 import CustomerEditModal from "../../components/customer/CustomerEditModal";
 
@@ -18,6 +18,7 @@ class CustomerManage extends Component {
               {"code":"3", "name":"其他"},
             ],
             page: 1,
+            pageSize: 10,
             channelCode: undefined,
             customerId: undefined,
             name: undefined,
@@ -28,37 +29,53 @@ class CustomerManage extends Component {
     }
 
     componentDidMount() {
-      this.handleSearch(this.state.page);
+      this.handleSearch(this.state.page, this.state.pageSize);
     }
 
     handleCustomerIdChange = (e) => {
-      this.setState({customerId : e.target.value});
+      this.setState({
+        customerId : e.target.value
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
     };
 
     handleNameChange = (e) => {
-        this.setState({name : e.target.value});
+        this.setState({
+          name : e.target.value
+        }, function () {
+          this.handleSearch(1, this.state.pageSize);
+        });
     };
 
     handleWeChatNameChange = (e) => {
-      this.setState({weChatName : e.target.value});
+      this.setState({
+        weChatName : e.target.value
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
     };
 
     handleMobileChange = (e) => {
-      this.setState({mobile : e.target.value});
+      this.setState({
+        mobile : e.target.value
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
     };
 
     refresh = () => {
         this.handleSearch(this.state.page);
     };
 
-    handleSearch = (page) => {
+    handleSearch = (page, pageSize) => {
       CustomerAPI.findByPage({
             customerId : this.state.customerId,
             name : this.state.name,
             weChatName : this.state.weChatName,
             mobile : this.state.mobile,
             pageNum: page,
-            pageSize : 10
+            pageSize : pageSize
         }).then((res) => {
             if (res.data.success) {
               console.log("data", res.data.data);
@@ -123,9 +140,16 @@ class CustomerManage extends Component {
             current : customerPage.current,
             pageSize : customerPage.size,
             showTotal: total => `共 ${total} 条记录`,
-            onChange: (page) => {
-                this.handleSearch(page);
-            }
+            onChange: (page, pageSize) => {
+                this.handleSearch(page, pageSize);
+            },
+            onShowSizeChange: (current, pageSize) => {
+              this.setState({
+                pageSize: pageSize
+              });
+              this.handleSearch(current, pageSize);
+            },
+            showSizeChanger: true
         };
 
         return (
@@ -138,15 +162,15 @@ class CustomerManage extends Component {
                     </Row>
                     <Row style={{paddingTop: 24}}>
                         <Col span={20}>
-                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户id" allowClear
-                                   value={this.state.id} onChange={this.handleCustomerIdChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户名称" allowClear
                                    value={this.state.name} onChange={this.handleNameChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户微信名称" allowClear
                                    value={this.state.weChatName} onChange={this.handleWeChatNameChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入手机号" allowClear
                                    value={this.state.mobile} onChange={this.handleMobileChange}/>
-                            <Button type="primary" style={{marginRight: 10}} onClick={() => {this.handleSearch(1)}}>搜索</Button>
+                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户id" allowClear
+                                   value={this.state.id} onChange={this.handleCustomerIdChange}/>
+                            {/*<Button type="primary" style={{marginRight: 10}} onClick={() => {this.handleSearch(1)}}>搜索</Button>*/}
                         </Col>
                         <Col span={4} style={{textAlign: "right"}}>
                             <CustomerEditModal type="add"
