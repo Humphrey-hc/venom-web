@@ -1,7 +1,10 @@
 import React, {Component} from 'react';
-import { Modal, Form, Input, Button, notification, Select, InputNumber} from 'antd';
+import { Modal, Form, Input, Button, notification, Select, InputNumber, DatePicker} from 'antd';
 import {commonMessage, deepClone} from "../CommonFunction";
 import InGoodsAPI from "../api/InGoodsAPI";
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 
 const formItemLayout = {
     labelCol: {span: 4},
@@ -18,8 +21,7 @@ class InGoodsEditModal extends Component {
             disable : false,
             inGoodsVO: {},
             channelList: [],
-            tagId: undefined,
-            parentTagId: undefined,
+            goodsList: [],
         }
     }
 
@@ -38,42 +40,37 @@ class InGoodsEditModal extends Component {
         }
 
         //校验
-        if (!this.state.inGoodsVO.bizId) {
-            notification.error({message : "保存失败", description : "业务类型必选"});
+        if (!this.state.inGoodsVO.channelOrderNo) {
+            notification.error({message : "保存失败", description : "渠道订单号必填"});
             return;
         }
-        if (!this.state.inGoodsVO.name) {
-            notification.error({message : "保存失败", description : "姓名必填"});
+        if (!this.state.inGoodsVO.channelWaybillNo) {
+            notification.error({message : "保存失败", description : "渠道运单号必填"});
             return;
         }
-        if (this.state.inGoodsVO.name.length > 20) {
-            notification.error({message : "保存失败", description : "姓名长度不能大于20"});
-            return;
+        if (!this.state.inGoodsVO.goodsId) {
+          notification.error({message : "保存失败", description : "商品必选"});
+          return;
         }
-        if (!this.state.inGoodsVO.phone) {
-            notification.error({message : "保存失败", description : "手机号必填"});
-            return;
+        if (!this.state.inGoodsVO.dateStorage) {
+          notification.error({message : "保存失败", description : "采购失败必选"});
+          return;
         }
-        if (! (this.state.inGoodsVO.phone.match(phoneRegx)) ) {
-            notification.error({message : "保存失败", description : "请填写有效手机号"});
-            return;
-        }
-
-        if (this.state.inGoodsVO.remark && this.state.clueVO.remark.length > 200) {
-            notification.error({message : "保存失败", description : "备注长度不能大于200"});
-            return;
+        if (!this.state.inGoodsVO.num) {
+          notification.error({message : "保存失败", description : "数量必填"});
+          return;
         }
         this.setState({disable:true});
 
-      InGoodsAPI.saveOrUpdate(this.state.inGoodsVO)
-        .then((res) => {
-            let flag = commonMessage(res);
-            this.setState({disable:false});
-            if (flag) {
-                this.setState({modalVisible : false});
-                this.props.refresh();
-            }
-        });
+        InGoodsAPI.saveOrUpdateInGoods(this.state.inGoodsVO)
+          .then((res) => {
+              let flag = commonMessage(res);
+              this.setState({disable:false});
+              if (flag) {
+                  this.setState({modalVisible : false});
+                  this.props.refresh();
+              }
+          });
     };
 
     onCancel = () => {
@@ -85,8 +82,13 @@ class InGoodsEditModal extends Component {
         this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
     };
 
-    handleGoodsIdChange = (e) => {
-      this.state.inGoodsVO.goodsId = e.target.value;
+    handleChannelWaybillNoChange = (e) => {
+      this.state.inGoodsVO.channelWaybillNo = e.target.value;
+      this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
+    };
+
+    handleGoodsIdChange = (value) => {
+      this.state.inGoodsVO.goodsId = value;
       this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
     };
 
@@ -94,6 +96,13 @@ class InGoodsEditModal extends Component {
       this.state.inGoodsVO.num = value;
       this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
     };
+
+    handleDateStorageChange = (date, dateString) => {
+      this.state.inGoodsVO.dateStorage = dateString;
+      this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
+    };
+
+    handleGoodsIdSearch = (value) => {};
 
     render() {
 
@@ -116,12 +125,28 @@ class InGoodsEditModal extends Component {
                     <Input style={{width : 500}} value={this.state.inGoodsVO.channelOrderNo}
                            onChange={this.handleChannelOrderNoChange} placeholder="请输入渠道订单号"/>
                 </FormItem>
-                <FormItem label="商品ID" {...formItemLayout} required={true}>
-                    <Input style={{width : 500}} value={this.state.inGoodsVO.goodsId}
-                           onChange={this.handleGoodsIdChange} placeholder="请输入商品ID"/>
+                <FormItem label="渠道运单号" {...formItemLayout} required={true}>
+                    <Input style={{width : 500}} value={this.state.inGoodsVO.channelWaybillNo}
+                           onChange={this.handleChannelWaybillNoChange} placeholder="请输入渠道运单号"/>
+                </FormItem>
+                <FormItem label="请选择商品" {...formItemLayout} required={true}>
+                    <Select style={{width : 500}}  value={this.state.inGoodsVO.goodsId}
+                            required={true} allowClear={true} showSearch
+                            onSearch={this.handleGoodsIdSearch}
+                            filterOption={(input, option) =>
+                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange = {this.handleGoodsIdChange} placeholder="请选择商品">
+                      {this.props.goodsList}
+                    </Select>
+                </FormItem>
+                <FormItem label="采购时间" {...formItemLayout} required={true}>
+                  <DatePicker style={{width : 500}} onChange={this.handleDateStorageChange} format="YYYY-MM-DD"
+                              defaultValue = {this.state.inGoodsVO.dateStorage ? moment(this.state.inGoodsVO.dateStorage, "YYYY-MM-DD") : null}
+                              placeholder="请选择采购时间" locale={locale}/>
                 </FormItem>
                <FormItem label="数量" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.inGoodsVO.num}
+                    <InputNumber style={{width : 500}} min={0} precision = {0} value={this.state.inGoodsVO.num}
                            onChange={this.handleNumChange} placeholder="请输入数量"/>
                 </FormItem>
             </Modal>

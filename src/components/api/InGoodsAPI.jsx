@@ -3,39 +3,26 @@ import queryString from 'qs';
 
 const InGoodsAPI = {
 
-    saveOrUpdate : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/saveOrUpdate.json`,
-            param
-        )
+    saveOrUpdateInGoods : (param) => {
+      return axios.post(
+        `${SERVER_URL}/inGoods/saveOrUpdateInGoods`,
+        param
+      )
     },
 
-    getById : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getById.json`,
-            queryString.stringify(param),
-        )
+    deleteInGoods : (param) => {
+      return axios.delete(`${SERVER_URL}/inGoods/deleteInGoods/${param}`)
     },
 
-    deleteById : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/deleteById.json`,
-            queryString.stringify(param),
-        )
+    getInGoodsByPage : (param) => {
+      return axios.post(
+        `${SERVER_URL}/inGoods/getInGoodsByPage`,
+        queryString.stringify(param),
+      )
     },
 
-    findByPage : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/findByPage.json`,
-            queryString.stringify(param),
-        )
-    },
-
-    getAllBizType : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getAllBizType.json`,
-            queryString.stringify(param),
-        )
+    getGoodsList : (param) => {
+      return axios.get(`${SERVER_URL}/goods/getGoodsList`)
     },
 
 };

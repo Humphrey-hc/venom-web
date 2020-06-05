@@ -28,11 +28,8 @@ const GoodsAPI = {
         )
     },
 
-    getAllBizType : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getAllBizType.json`,
-            queryString.stringify(param),
-        )
+    getGoodsList : (param) => {
+        return axios.get(`${SERVER_URL}/goods/getGoodsList`)
     },
 
 };
