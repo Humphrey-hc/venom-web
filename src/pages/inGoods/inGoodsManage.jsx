@@ -118,6 +118,24 @@ class InGoodsManage extends Component {
         });
     };
 
+    handleSignedInGoods = (id) => {
+      confirm({
+        title: '签收入库',
+        content: <div><p>是否确认签收?</p></div>,
+        onOk : () => {
+          InGoodsAPI.signedInGoods(id).then((res) => {
+            if (res.data.success) {
+              notification.success({message: "操作成功", description: "签收成功"});
+              setTimeout(() => {this.handleSearch(this.state.page);});
+            } else {
+              notification.error({message: "操作失败", description: "签收失败"});
+            }
+          })
+        },
+        onCancel: () => {},
+      });
+    };
+
 
     render() {
 
@@ -141,11 +159,19 @@ class InGoodsManage extends Component {
             { title : "入库时间", key : "dateStorage", dataIndex : "dateStorage", width: "150px"},
             { title : "状态", key : "inGoodsStatusName", dataIndex : "inGoodsStatusName", width: "100px"},
             { title : "数量", key : "num", dataIndex : "num", width: "100px"},
-            { title : "操作", key : "operate", dataIndex : "", width: "100px",
+            { title : "操作", key : "operate", dataIndex : "", width: "150px",
                 render : (text, record) => {
                     return (
                         <div>
                             <div>
+                              {record.inGoodsStatusCode === 1 ?
+                                <span>
+                                  <a onClick={() => {this.handleSignedInGoods(record.id)}}>签收</a>
+                                  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                </span>
+                                :
+                                null
+                              }
                                 <InGoodsEditModal type="edit" item={record} key={record.id} channelList={channelList} goodsList={goodsList}
                                                   refresh={this.refresh.bind(this)} />
                                 &nbsp;&nbsp;|&nbsp;&nbsp;

@@ -25,6 +25,10 @@ const InGoodsAPI = {
       return axios.get(`${SERVER_URL}/goods/getGoodsList`)
     },
 
+    signedInGoods : (param) => {
+      return axios.get(`${SERVER_URL}/inGoods/signedInGoods/${param}`)
+    },
+
 };
 
 export default InGoodsAPI;
