@@ -28,6 +28,10 @@ const CustomerAPI = {
         )
     },
 
+    getCustomerList : (param) => {
+      return axios.get(`${SERVER_URL}/customer/getCustomerList`)
+    },
+
     getProvince : () => {
       return axios.get(`${SERVER_URL}/area/getProvince`)
     },

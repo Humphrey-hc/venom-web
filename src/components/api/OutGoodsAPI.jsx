@@ -3,9 +3,9 @@ import queryString from 'qs';
 
 const OutGoodsAPI = {
 
-    saveOrUpdate : (param) => {
+    saveOrUpdateOutGoods : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/saveOrUpdate.json`,
+            `${SERVER_URL}/outGoods/saveOrUpdateOutGoods`,
             param
         )
     },
@@ -17,27 +17,17 @@ const OutGoodsAPI = {
         )
     },
 
-    deleteById : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/deleteById.json`,
-            queryString.stringify(param),
+    deleteOutGoods : (param) => {
+        return axios.delete(`${SERVER_URL}/outGoods/deleteOutGoods/${param}`,
         )
     },
 
-    findByPage : (param) => {
+    getOutGoodsByPage : (param) => {
         return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/findByPage.json`,
+            `${SERVER_URL}/outGoods/getOutGoodsByPage`,
             queryString.stringify(param),
         )
     },
-
-    getAllBizType : (param) => {
-        return axios.post(
-            `${SERVER_URL}/api/ConsultationManageAPI/getAllBizType.json`,
-            queryString.stringify(param),
-        )
-    },
-
 };
 
 export default OutGoodsAPI;

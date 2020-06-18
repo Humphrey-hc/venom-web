@@ -172,10 +172,16 @@ class InGoodsManage extends Component {
                                 :
                                 null
                               }
-                                <InGoodsEditModal type="edit" item={record} key={record.id} channelList={channelList} goodsList={goodsList}
-                                                  refresh={this.refresh.bind(this)} />
-                                &nbsp;&nbsp;|&nbsp;&nbsp;
-                                <a onClick={() => {this.handleDelete(record.id)}}>删除</a>
+                              {record.inGoodsStatusCode === 1 ?
+                                <span>
+                                  <InGoodsEditModal type="edit" item={record} key={record.id} channelList={channelList} goodsList={goodsList}
+                                                    refresh={this.refresh.bind(this)} />
+                                  &nbsp;&nbsp;|&nbsp;&nbsp;
+                                  <a onClick={() => {this.handleDelete(record.id)}}>删除</a>
+                                </span>
+                                :
+                               null
+                              }
                             </div>
                         </div>)
                 }
