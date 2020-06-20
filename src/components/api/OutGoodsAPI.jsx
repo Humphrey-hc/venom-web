@@ -22,6 +22,13 @@ const OutGoodsAPI = {
         )
     },
 
+    updateOutGoodsStatus : (param) => {
+      return axios.post(
+        `${SERVER_URL}/outGoods/updateOutGoodsStatus`,
+        queryString.stringify(param),
+      )
+    },
+
     getOutGoodsByPage : (param) => {
         return axios.post(
             `${SERVER_URL}/outGoods/getOutGoodsByPage`,

@@ -1,11 +1,14 @@
 import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import {Button, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal} from "antd";
+import {Button, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, DatePicker} from "antd";
 import OutGoodsAPI from "../../components/api/OutGoodsAPI";
 import OutGoodsEditModal from "../../components/outGoods/OutGoodsEditModal";
 import GoodsAPI from "../../components/api/GoodsAPI";
 import CustomerAPI from "../../components/api/CustomerAPI";
+import {deepClone, dateFormat} from "../../components/CommonFunction";
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import moment from 'moment';
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -21,11 +24,17 @@ class OutGoodsManage extends Component {
               {"code":"2", "name":"大萌严选"},
               {"code":"3", "name":"其他"},
             ],
+            statusList:[
+              {"code":1, "name":"未发货"},
+              {"code":2, "name":"待签收"},
+              {"code":3, "name":"已签收"},
+              {"code":4, "name":"退货"},
+            ],
             channelCode: undefined,
-            outGoodsId: undefined,
-            goodsId: undefined,
             goodsName: undefined,
             customerName: undefined,
+            dateOut: undefined,
+            status: undefined,
             outGoodsPage: {},
             goodsList: [],
             customerList: []
@@ -58,12 +67,12 @@ class OutGoodsManage extends Component {
         });
     };
 
-    handleOutGoodsIdChange = (e) => {
-        this.setState({
-          outGoodsId : e.target.value
-        }, function () {
-          this.handleSearch(1, this.state.pageSize);
-        });
+    handleStatusCodeChange = (value) => {
+      this.setState({
+        status: value
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
     };
 
     handleGoodsNameChange = (e) => {
@@ -82,17 +91,25 @@ class OutGoodsManage extends Component {
       });
     };
 
+    handleDateOutChange = (date, dateString) => {
+      this.setState({
+        dateOut : dateString
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
+    };
+
     refresh = () => {
         this.handleSearch(this.state.page);
     };
 
     handleSearch = (page, pageSize) => {
       OutGoodsAPI.getOutGoodsByPage({
-            outGoodsId : this.state.outGoodsId,
-            goodsId : this.state.goodsId,
+            dateOut : this.state.dateOut,
             goodsName : this.state.goodsName,
             customerName : this.state.customerName,
             channelCode : this.state.channelCode,
+            status : this.state.status,
             pageNo: page,
             pageSize : pageSize
         }).then((res) => {
@@ -113,7 +130,7 @@ class OutGoodsManage extends Component {
               OutGoodsAPI.deleteOutGoods(id).then((res) => {
                     if (res.data.success) {
                         notification.success({message: "操作成功", description: "删除成功"});
-                        setTimeout(() => {this.handleSearch(this.state.page);});
+                        setTimeout(() => {this.handleSearch(this.state.page, this.state.pageSize);});
                     } else {
                         notification.error({message: "操作失败", description: "删除失败"});
                     }
@@ -121,6 +138,27 @@ class OutGoodsManage extends Component {
             },
             onCancel: () => {},
         });
+    };
+
+    handleStatus = (id, status) => {
+      confirm({
+        title: '出库状态修改',
+        content: <div><p>是否确认修改状态?</p></div>,
+        onOk : () => {
+          OutGoodsAPI.updateOutGoodsStatus({
+            status : status,
+            outGoodsId : id,
+          }).then((res) => {
+            if (res.data.success) {
+              notification.success({message: "操作成功", description: "执行成功"});
+              setTimeout(() => {this.handleSearch(this.state.page, this.state.pageSize);});
+            } else {
+              notification.error({message: "操作失败", description: "执行失败"});
+            }
+          })
+        },
+        onCancel: () => {},
+      });
     };
 
 
@@ -133,6 +171,9 @@ class OutGoodsManage extends Component {
         });
         let customerList = this.state.customerList.map((customer) => {
           return (<Option value={customer.id} key={customer.id}>{customer.id + "-" +customer.name}</Option>)
+        });
+        let statusList = this.state.statusList.map((status) => {
+          return (<Option value={status.code} key={status.code}>{status.name}</Option>)
         });
         let outGoodsPage = this.state.outGoodsPage;
 
@@ -147,6 +188,7 @@ class OutGoodsManage extends Component {
             { title : "佣金", key : "brokerage", dataIndex : "brokerage", width: "100px"},
             { title : "实际利润", key : "profit", dataIndex : "profit", width: "100px"},
             { title : "状态", key : "outGoodsStatusName", dataIndex : "outGoodsStatusName", width: "100px"},
+            { title : "出库时间", key : "dateCreate", dataIndex : "dateCreate", width: "150px"},
             { title : "操作", key : "operate", dataIndex : "", width: "120px", fixed: 'right',
                 render : (text, record) => {
                     return (
@@ -158,14 +200,16 @@ class OutGoodsManage extends Component {
                                 <a onClick={() => {this.handleDelete(record.id)}}>删除</a><br/>
                                 {record.outGoodsStatusCode === 1 ?
                                   <span>
-                                    <a>发货</a>
+                                    <a onClick={() => {this.handleStatus(record.id, 2)}}>发货</a>
                                   </span>
                                   :
                                   null
                                 }
                                 {record.outGoodsStatusCode === 2 ?
                                   <span>
-                                    <a>签收</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a>退货</a>
+                                    <a onClick={() => {this.handleStatus(record.id, 3)}}>签收</a>
+                                    &nbsp;&nbsp;|&nbsp;&nbsp;
+                                    <a onClick={() => {this.handleStatus(record.id, 4)}}>退货</a>
                                   </span>
                                   :
                                   null
@@ -207,13 +251,17 @@ class OutGoodsManage extends Component {
                                    value={this.state.goodsName} onChange={this.handleGoodsNameChange}/>
                             <Input style={{width: 160, marginRight: 10}} placeholder="请输入客户名称" allowClear
                                    value={this.state.customerName} onChange={this.handleCustomerNameChange}/>
-                            <Input style={{width: 160, marginRight: 10}} placeholder="请输入出库id" allowClear
-                                   value={this.state.outGoodsId} onChange={this.handleOutGoodsIdChange}/>
-
                             <Select style={{width : 160, marginRight : 10}}  value={this.state.channelCode} allowClear={true}
                                   onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
                               {channelList}
                             </Select>
+                          <Select style={{width : 160, marginRight : 10}}  value={this.state.status} allowClear={true}
+                                  onChange = {this.handleStatusCodeChange} placeholder="请选择状态">
+                            {statusList}
+                          </Select>
+                            <DatePicker style={{width: 160, marginRight: 10}} onChange={this.handleDateOutChange} format="YYYY-MM-DD"
+                                        defaultValue = {this.state.dateOut ? moment(this.state.dateOut, "YYYY-MM-DD") : null}
+                                        placeholder="请选择出库时间" locale={locale}/>
                         </Col>
                         <Col span={4} style={{textAlign: "right"}}>
                             <OutGoodsEditModal type="add"

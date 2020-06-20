@@ -108,7 +108,7 @@ class InGoodsManage extends Component {
               InGoodsAPI.deleteInGoods(id).then((res) => {
                     if (res.data.success) {
                         notification.success({message: "操作成功", description: "删除成功"});
-                        setTimeout(() => {this.handleSearch(this.state.page);});
+                        setTimeout(() => {this.handleSearch(this.state.page, this.state.pageSize);});
                     } else {
                         notification.error({message: "操作失败", description: "删除失败"});
                     }
@@ -126,7 +126,7 @@ class InGoodsManage extends Component {
           InGoodsAPI.signedInGoods(id).then((res) => {
             if (res.data.success) {
               notification.success({message: "操作成功", description: "签收成功"});
-              setTimeout(() => {this.handleSearch(this.state.page);});
+              setTimeout(() => {this.handleSearch(this.state.page, this.state.pageSize);});
             } else {
               notification.error({message: "操作失败", description: "签收失败"});
             }
