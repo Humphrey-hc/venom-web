@@ -54,6 +54,10 @@ class OutGoodsEditModal extends Component {
           notification.error({message : "保存失败", description : "实际成本必填"});
           return;
         }
+        if (!this.state.outGoodsVO.actualPostage) {
+          notification.error({message : "保存失败", description : "实际邮费必填"});
+          return;
+        }
         if (this.state.outGoodsVO.brokerage === undefined) {
           notification.error({message : "保存失败", description : "佣金必填"});
           return;
@@ -97,6 +101,11 @@ class OutGoodsEditModal extends Component {
       this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
     };
 
+    handleActualPostageChange = (value) => {
+      this.state.outGoodsVO.actualPostage = value;
+      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+    };
+
     handleActualBuyingPriceChange = (value) => {
       this.state.outGoodsVO.actualBuyingPrice = value;
       this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
@@ -110,6 +119,19 @@ class OutGoodsEditModal extends Component {
     handleNumChange = (value) => {
       this.state.outGoodsVO.num = value;
       this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+    };
+
+    handleCalculatePostage = () => {
+      OutGoodsAPI.calculatePostage({
+        goodsId : this.state.outGoodsVO.goodsId,
+        customerId : this.state.outGoodsVO.customerId,
+        num : this.state.outGoodsVO.num,
+      }).then((res) => {
+          if (res.data.success) {
+            this.state.outGoodsVO.actualPostage = res.data.data;
+            this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+          }
+        });
     };
 
     render() {
@@ -160,6 +182,20 @@ class OutGoodsEditModal extends Component {
                 <FormItem label="实际销售价格(元)" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualSellingPrice}
                            onChange={this.handleActualSellingPriceChange} placeholder="请输入实际销售价格"/>
+                </FormItem>
+                <FormItem label="实际邮费(元)" {...formItemLayout} required={true}>
+                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualPostage}
+                                 onChange={this.handleActualPostageChange} placeholder="请输入实际销售价格"/>
+                    &nbsp;&nbsp;&nbsp;&nbsp;
+                    <Button type="primary"
+                            onClick={this.handleCalculatePostage}
+                            disabled={
+                              this.state.outGoodsVO.customerId === undefined ||
+                              this.state.outGoodsVO.goodsId === undefined ||
+                              this.state.outGoodsVO.num === undefined}
+                    >
+                      计算
+                    </Button>
                 </FormItem>
                <FormItem label="实际成本价格(元)" {...formItemLayout} required={true}>
                     <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualBuyingPrice}

@@ -69,21 +69,12 @@ class InGoodsManage extends Component {
         });
     };
 
-    handleInGoodsIdChange = (e) => {
-      this.setState({
-        inGoodsId : e.target.value
-      }, function () {
-        this.handleSearch(1, this.state.pageSize);
-      });
-    };
-
     refresh = () => {
         this.handleSearch(this.state.page);
     };
 
     handleSearch = (page, pageSize) => {
       InGoodsAPI.getInGoodsByPage({
-            inGoodsId : this.state.inGoodsId,
             goodsId : this.state.goodsId,
             goodsName : this.state.goodsName,
             channelCode : this.state.channelCode,
@@ -151,7 +142,6 @@ class InGoodsManage extends Component {
         let inGoodsPage = this.state.inGoodsPage;
 
         let columns = [
-            { title : "ID", key : "id", dataIndex : "id", width: "50px"},
             { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px"},
             { title : "渠道订单号", key : "channelOrderNo", dataIndex : "channelOrderNo", width: "150px"},
             { title : "渠道运单号", key : "channelWaybillNo", dataIndex : "channelWaybillNo", width: "150px"},
@@ -217,8 +207,6 @@ class InGoodsManage extends Component {
                         <Col span={20}>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入商品名称" allowClear
                                  value={this.state.goodsName} onChange={this.handleGoodsNameChange}/>
-                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入入库id" allowClear
-                                   value={this.state.inGoodsId} onChange={this.handleInGoodsIdChange}/>
                             <Select style={{width : 200, marginRight : 10}}  value={this.state.channelCode} allowClear={true}
                                   onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
                               {channelList}

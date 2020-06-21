@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import {Button, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, DatePicker} from "antd";
+import {Badge, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, DatePicker,  Popover} from "antd";
 import OutGoodsAPI from "../../components/api/OutGoodsAPI";
 import OutGoodsEditModal from "../../components/outGoods/OutGoodsEditModal";
 import GoodsAPI from "../../components/api/GoodsAPI";
@@ -35,6 +35,7 @@ class OutGoodsManage extends Component {
             customerName: undefined,
             dateOut: undefined,
             status: undefined,
+            remark: undefined,
             outGoodsPage: {},
             goodsList: [],
             customerList: []
@@ -99,6 +100,10 @@ class OutGoodsManage extends Component {
       });
     };
 
+    handleRemarkChange = (e) => {
+      this.setState({remark : e.target.value});
+    };
+
     refresh = () => {
         this.handleSearch(this.state.page);
     };
@@ -161,6 +166,37 @@ class OutGoodsManage extends Component {
       });
     };
 
+    handleRemark = (record) => {
+      confirm({
+        title: '编辑备注',
+        content:
+        <div>
+          <Input placeholder="请输入备注" allowClear defaultValue={record.remark}
+                 value={this.state.remark} onChange={this.handleRemarkChange}/>
+        </div>,
+        onOk : () => {
+          OutGoodsAPI.updateOutGoodsRemark({
+            remark : this.state.remark,
+            outGoodsId : record.id,
+          }).then((res) => {
+            if (res.data.success) {
+              notification.success({message: "操作成功", description: "修改成功"});
+              setTimeout(() => {
+                this.handleSearch(this.state.page, this.state.pageSize);
+                this.setState({remark: undefined});
+              });
+            } else {
+              notification.error({message: "操作失败", description: "修改失败"});
+              this.setState({remark: undefined});
+            }
+          })
+        },
+        onCancel: () => {
+          this.setState({remark: undefined});
+        },
+      });
+    };
+
 
     render() {
         let goodsList = this.state.goodsList.map((goods) => {
@@ -178,10 +214,25 @@ class OutGoodsManage extends Component {
         let outGoodsPage = this.state.outGoodsPage;
 
         let columns = [
-            { title : "ID", key : "id", dataIndex : "id", width: "80px", fixed: 'left'},
-            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px", fixed: 'left'},
-            { title : "客户名称", key : "customerName", dataIndex : "customerName", width: "200px"},
+            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px", fixed: 'left',
+                render : (text, record) => {
+                  let remarkIsEmpty = record.remark === '' || record.remark === undefined;
+                  if (remarkIsEmpty) {
+                    return (<a onClick={() => {this.handleRemark(record)}}>{record.goodsName}</a>);
+                  } else {
+                    return (
+                      <Popover content={record.remark} title="备注">
+                        <Badge dot={true}>
+                          <a onClick={() => {this.handleRemark(record)}}>{record.goodsName}</a>
+                        </Badge>
+                      </Popover>
+                    );
+                  }
+                }
+            },
+            { title : "客户名称", key : "customerName", dataIndex : "customerName", width: "150px"},
             { title : "渠道", key : "channelName", dataIndex : "channelName", width: "150px"},
+            { title : "邮费", key : "actualPostage", dataIndex : "actualPostage", width: "100px"},
             { title : "实际售价", key : "actualSellingPrice", dataIndex : "actualSellingPrice", width: "100px"},
             { title : "实际成本", key : "actualBuyingPrice", dataIndex : "actualBuyingPrice", width: "100px"},
             { title : "数量", key : "num", dataIndex : "num", width: "100px"},

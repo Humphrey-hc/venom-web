@@ -46,21 +46,12 @@ class GoodsManage extends Component {
         });
     };
 
-    handleGoodsIdChange = (e) => {
-        this.setState({
-          goodsId : e.target.value
-        }, function () {
-          this.handleSearch(1, this.state.pageSize);
-        });
-    };
-
     refresh = () => {
         this.handleSearch(this.state.page);
     };
 
     handleSearch = (page, pageSize) => {
       GoodsAPI.getGoodsByPage({
-            goodsId : this.state.goodsId,
             goodsName : this.state.goodsName,
             channelCode : this.state.channelCode,
             pageNum: page,
@@ -101,7 +92,6 @@ class GoodsManage extends Component {
         let goodsPage = this.state.goodsPage;
 
         let columns = [
-            { title : "ID", key : "id", dataIndex : "id", width: "50px"},
             { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "250px"},
             { title : "渠道", key : "channelName", dataIndex : "channelName", width: "200px"},
             { title : "库存", key : "stockNum", dataIndex : "stockNum", width: "80px", align:"center",
@@ -186,9 +176,6 @@ class GoodsManage extends Component {
                                   onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
                               {channelList}
                             </Select>
-                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入商品id" allowClear
-                                   value={this.state.goodsId} onChange={this.handleGoodsIdChange}/>
-                           {/* <Button type="primary" style={{marginRight: 10}} htmlType="submit" onClick={() => {this.handleSearch(1)}}>搜索</Button>*/}
                         </Col>
                         <Col span={9} style={{textAlign: "right"}}>
                             <GoodsEditModal type="add"

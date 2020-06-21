@@ -29,12 +29,28 @@ const OutGoodsAPI = {
       )
     },
 
+    updateOutGoodsRemark : (param) => {
+      return axios.post(
+        `${SERVER_URL}/outGoods/updateOutGoodsRemark`,
+        queryString.stringify(param),
+      )
+    },
+
     getOutGoodsByPage : (param) => {
         return axios.post(
             `${SERVER_URL}/outGoods/getOutGoodsByPage`,
             queryString.stringify(param),
         )
     },
+
+    calculatePostage : (param) => {
+      return axios.post(
+        `${SERVER_URL}/outGoods/calculatePostage`,
+        queryString.stringify(param),
+      )
+    },
+
+
 };
 
 export default OutGoodsAPI;

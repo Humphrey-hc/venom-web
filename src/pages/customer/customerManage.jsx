@@ -32,14 +32,6 @@ class CustomerManage extends Component {
       this.handleSearch(this.state.page, this.state.pageSize);
     }
 
-    handleCustomerIdChange = (e) => {
-      this.setState({
-        customerId : e.target.value
-      }, function () {
-        this.handleSearch(1, this.state.pageSize);
-      });
-    };
-
     handleNameChange = (e) => {
         this.setState({
           name : e.target.value
@@ -70,7 +62,6 @@ class CustomerManage extends Component {
 
     handleSearch = (page, pageSize) => {
       CustomerAPI.findByPage({
-            customerId : this.state.customerId,
             name : this.state.name,
             weChatName : this.state.weChatName,
             mobile : this.state.mobile,
@@ -113,7 +104,6 @@ class CustomerManage extends Component {
         let customerPage = this.state.customerPage;
 
         let columns = [
-            { title : "ID", key : "id", dataIndex : "id", width: "50px"},
             { title : "客户名称", key : "name", dataIndex : "name", width: "150px"},
             { title : "微信备注", key : "weChatName", dataIndex : "weChatName", width: "200px"},
             { title : "手机号", key : "mobile", dataIndex : "mobile", width: "200px"},
@@ -168,9 +158,6 @@ class CustomerManage extends Component {
                                    value={this.state.weChatName} onChange={this.handleWeChatNameChange}/>
                             <Input style={{width: 200, marginRight: 10}} placeholder="请输入手机号" allowClear
                                    value={this.state.mobile} onChange={this.handleMobileChange}/>
-                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入客户id" allowClear
-                                   value={this.state.id} onChange={this.handleCustomerIdChange}/>
-                            {/*<Button type="primary" style={{marginRight: 10}} onClick={() => {this.handleSearch(1)}}>搜索</Button>*/}
                         </Col>
                         <Col span={4} style={{textAlign: "right"}}>
                             <CustomerEditModal type="add"
