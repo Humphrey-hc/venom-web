@@ -34,6 +34,7 @@ class OutGoodsManage extends Component {
             goodsName: undefined,
             customerName: undefined,
             dateOut: undefined,
+            dateDeliver: undefined,
             status: undefined,
             remark: undefined,
             outGoodsPage: {},
@@ -100,6 +101,14 @@ class OutGoodsManage extends Component {
       });
     };
 
+    handleDateDeliverChange = (date, dateString) => {
+      this.setState({
+        dateDeliver : dateString
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
+    };
+
     handleRemarkChange = (e) => {
       this.setState({remark : e.target.value});
     };
@@ -111,6 +120,7 @@ class OutGoodsManage extends Component {
     handleSearch = (page, pageSize) => {
       OutGoodsAPI.getOutGoodsByPage({
             dateOut : this.state.dateOut,
+            dateDeliver : this.state.dateDeliver,
             goodsName : this.state.goodsName,
             customerName : this.state.customerName,
             channelCode : this.state.channelCode,
@@ -240,6 +250,7 @@ class OutGoodsManage extends Component {
             { title : "实际利润", key : "profit", dataIndex : "profit", width: "100px"},
             { title : "状态", key : "outGoodsStatusName", dataIndex : "outGoodsStatusName", width: "100px"},
             { title : "出库时间", key : "dateCreate", dataIndex : "dateCreate", width: "150px"},
+            { title : "发货时间", key : "dateDeliver", dataIndex : "dateDeliver", width: "150px"},
             { title : "操作", key : "operate", dataIndex : "", width: "120px", fixed: 'right',
                 render : (text, record) => {
                     return (
@@ -306,13 +317,16 @@ class OutGoodsManage extends Component {
                                   onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
                               {channelList}
                             </Select>
-                          <Select style={{width : 160, marginRight : 10}}  value={this.state.status} allowClear={true}
-                                  onChange = {this.handleStatusCodeChange} placeholder="请选择状态">
-                            {statusList}
-                          </Select>
+                            <Select style={{width : 160, marginRight : 10}}  value={this.state.status} allowClear={true}
+                                    onChange = {this.handleStatusCodeChange} placeholder="请选择状态">
+                              {statusList}
+                            </Select>
                             <DatePicker style={{width: 160, marginRight: 10}} onChange={this.handleDateOutChange} format="YYYY-MM-DD"
                                         defaultValue = {this.state.dateOut ? moment(this.state.dateOut, "YYYY-MM-DD") : null}
                                         placeholder="请选择出库时间" locale={locale}/>
+                            <DatePicker style={{width: 160, marginRight: 10}} onChange={this.handleDateDeliverChange} format="YYYY-MM-DD"
+                                        defaultValue = {this.state.dateDeliver ? moment(this.state.dateDeliver, "YYYY-MM-DD") : null}
+                                        placeholder="请选择发货时间" locale={locale}/>
                         </Col>
                         <Col span={4} style={{textAlign: "right"}}>
                             <OutGoodsEditModal type="add"
