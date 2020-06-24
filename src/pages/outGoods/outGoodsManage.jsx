@@ -125,7 +125,7 @@ class OutGoodsManage extends Component {
             customerName : this.state.customerName,
             channelCode : this.state.channelCode,
             status : this.state.status,
-            pageNo: page,
+            pageNum: page,
             pageSize : pageSize
         }).then((res) => {
             if (res.data.success) {
@@ -224,7 +224,7 @@ class OutGoodsManage extends Component {
         let outGoodsPage = this.state.outGoodsPage;
 
         let columns = [
-            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px", fixed: 'left',
+            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "200px", fixed: 'left',
                 render : (text, record) => {
                   let remarkIsEmpty = record.remark === '' || record.remark === undefined;
                   if (remarkIsEmpty) {
