@@ -215,20 +215,45 @@ class CustomerEditModal extends Component {
                            onChange={this.handleMobileChange} placeholder="请输入手机号"/>
                 </FormItem>
                 <FormItem label="省份" {...formItemLayout} required={true}>
-                    <Select style={{width : 500, marginRight : 10}}  value={this.state.customerVO.provinceCode} allowClear={true}
-                            onChange = {this.handleProvinceChange} placeholder="请选择省份">
+                    <Select style={{width : 500, marginRight : 10}}
+                            value={this.state.customerVO.provinceCode}
+                            allowClear={true}
+                            required={true}
+                            showSearch
+                            onSearch={() => {}}
+                            filterOption={(input, option) =>
+                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            onChange = {this.handleProvinceChange}
+                            placeholder="请选择省份">
                         {provinceList}
                     </Select>
                 </FormItem>
                 <FormItem label="城市" {...formItemLayout} required={true}>
-                    <Select style={{width : 500, marginRight : 10}}  value={this.state.customerVO.cityCode} allowClear={true}
-                            onChange = {this.handleCityChange} placeholder="请选择城市">
+                    <Select style={{width : 500, marginRight : 10}}
+                            value={this.state.customerVO.cityCode}
+                            allowClear={true}
+                            onChange = {this.handleCityChange}
+                            showSearch
+                            onSearch={() => {}}
+                            filterOption={(input, option) =>
+                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            placeholder="请选择城市">
                         {cityList}
                     </Select>
                 </FormItem>
                 <FormItem label="地区" {...formItemLayout} required={true}>
-                    <Select style={{width : 500, marginRight : 10}}  value={this.state.customerVO.districtCode} allowClear={true}
-                            onChange = {this.handleDistrictChange} placeholder="请选择地区">
+                    <Select style={{width : 500, marginRight : 10}}
+                            value={this.state.customerVO.districtCode}
+                            allowClear={true}
+                            onChange = {this.handleDistrictChange}
+                            showSearch
+                            onSearch={() => {}}
+                            filterOption={(input, option) =>
+                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                            }
+                            placeholder="请选择地区">
                         {districtList}
                     </Select>
                 </FormItem>

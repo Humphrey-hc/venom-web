@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Modal, Form, Input, Button, notification, Select, InputNumber, DatePicker} from 'antd';
-import {commonMessage, deepClone} from "../CommonFunction";
+import {commonMessage, deepClone, dateFormat} from "../CommonFunction";
 import InGoodsAPI from "../api/InGoodsAPI";
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import moment from 'moment';
@@ -29,7 +29,9 @@ class InGoodsEditModal extends Component {
         if (this.props.item) {
             this.setState({inGoodsVO : deepClone(this.props.item),});
         } else {
-            this.state.inGoodsVO = {};
+            this.state.inGoodsVO = {
+              channelWaybillNo: "暂无"
+            };
         }
         this.setState({modalVisible : true});
     };
@@ -142,7 +144,8 @@ class InGoodsEditModal extends Component {
                 </FormItem>
                 <FormItem label="采购时间" {...formItemLayout} required={true}>
                   <DatePicker style={{width : 500}} onChange={this.handleDateStorageChange} format="YYYY-MM-DD"
-                              defaultValue = {this.state.inGoodsVO.dateStorage ? moment(this.state.inGoodsVO.dateStorage, "YYYY-MM-DD") : null}
+                              value = {this.state.inGoodsVO.dateStorage ?
+                                moment(this.state.inGoodsVO.dateStorage, "YYYY-MM-DD") : null}
                               placeholder="请选择采购时间" locale={locale}/>
                 </FormItem>
                <FormItem label="数量" {...formItemLayout} required={true}>

@@ -12,6 +12,7 @@ import GoodsManage from "./goods/GoodsManage";
 import InGoodsManage from "./inGoods/InGoodsManage";
 import OutGoodsManage from "./outGoods/OutGoodsManage";
 import CustomerManage from "./customer/CustomerManage";
+import Dashboard from "./dashboard/Dashboard";
 
 const {Header, Content, Sider} = Layout;
 
@@ -87,8 +88,8 @@ class Index extends Component {
                 }}
               >
                 {this.state.menuKey ?  content :
-                  <div style={{position:'absolute', bottom:'50%', left:'50%', fontSize:'xxx-large', color:"black"}}>
-                    欢迎使用VENOM管理后台
+                  <div style={{ background: '#f0f2f5', padding: '30px', minHeight: "100vh"}}>
+                    <Dashboard/>
                   </div>
                 }
               </Content>

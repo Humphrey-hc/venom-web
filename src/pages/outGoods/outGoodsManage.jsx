@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import {Badge, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, DatePicker,  Popover} from "antd";
+import {Badge, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, DatePicker,  Popover, Form} from "antd";
 import OutGoodsAPI from "../../components/api/OutGoodsAPI";
 import OutGoodsEditModal from "../../components/outGoods/OutGoodsEditModal";
 import GoodsAPI from "../../components/api/GoodsAPI";
@@ -9,6 +9,7 @@ import CustomerAPI from "../../components/api/CustomerAPI";
 import {deepClone, dateFormat} from "../../components/CommonFunction";
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import moment from 'moment';
+const FormItem = Form.Item;
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -33,9 +34,9 @@ class OutGoodsManage extends Component {
             channelCode: undefined,
             goodsName: undefined,
             customerName: undefined,
-            dateOut: undefined,
+            dateOut: dateFormat("YYYY-mm-dd", new Date()),
             dateDeliver: undefined,
-            status: undefined,
+            status: 1,
             remark: undefined,
             outGoodsPage: {},
             goodsList: [],
@@ -322,7 +323,7 @@ class OutGoodsManage extends Component {
                               {statusList}
                             </Select>
                             <DatePicker style={{width: 160, marginRight: 10}} onChange={this.handleDateOutChange} format="YYYY-MM-DD"
-                                        defaultValue = {this.state.dateOut ? moment(this.state.dateOut, "YYYY-MM-DD") : null}
+                                        defaultValue = {moment(this.state.dateOut, "YYYY-MM-DD")}
                                         placeholder="请选择出库时间" locale={locale}/>
                             <DatePicker style={{width: 160, marginRight: 10}} onChange={this.handleDateDeliverChange} format="YYYY-MM-DD"
                                         defaultValue = {this.state.dateDeliver ? moment(this.state.dateDeliver, "YYYY-MM-DD") : null}

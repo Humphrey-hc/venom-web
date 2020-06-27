@@ -108,7 +108,7 @@ class GoodsEditModal extends Component {
             {clickEle}
             <Modal title={title} width={700} visible={this.state.modalVisible}
                    onOk={this.onOk} onCancel={this.onCancel} key={this.props.key}>
-              <FormItem label="商品名" {...formItemLayout} required={true}>
+                <FormItem label="商品名" {...formItemLayout} required={true}>
                     <Input style={{width : 500}} value={this.state.goodsVO.goodsName}
                            onChange={this.handleGoodsNameChange} placeholder="请输入商品名"/>
                 </FormItem>

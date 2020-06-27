@@ -27,7 +27,11 @@ class OutGoodsEditModal extends Component {
         if (this.props.item) {
             this.setState({outGoodsVO : deepClone(this.props.item),});
         } else {
-            this.state.outGoodsVO = {};
+            this.state.outGoodsVO = {
+              actualPostage: 0,
+              brokerage: 0,
+              num: 1
+            };
         }
         this.setState({modalVisible : true});
     };
@@ -54,7 +58,7 @@ class OutGoodsEditModal extends Component {
           notification.error({message : "保存失败", description : "实际成本必填"});
           return;
         }
-        if (!this.state.outGoodsVO.actualPostage) {
+        if (this.state.outGoodsVO.actualPostage === undefined) {
           notification.error({message : "保存失败", description : "实际邮费必填"});
           return;
         }

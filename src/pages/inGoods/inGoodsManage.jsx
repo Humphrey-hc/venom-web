@@ -1,10 +1,20 @@
 import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
-import {Button, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal} from "antd";
+import {DatePicker, Col, Input, Row, Table, Select, notification, ConfigProvider, Modal, Form} from "antd";
 import InGoodsAPI from "../../components/api/InGoodsAPI";
 import InGoodsEditModal from "../../components/inGoods/InGoodsEditModal";
 import GoodsAPI from "../../components/api/GoodsAPI";
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import moment from 'moment';
+import {dateFormat} from '../../components/CommonFunction'
+
+const FormItem = Form.Item;
+
+const formItemLayout = {
+  labelCol: {span: 4},
+  wrapperCol: {span: 20},
+};
 
 const Option = Select.Option;
 const confirm = Modal.confirm;
@@ -26,11 +36,13 @@ class InGoodsManage extends Component {
               {"code":"2", "name":"已签收"},
             ],
             channelCode: undefined,
+            channelOrderCode: undefined,
             inGoodsId: undefined,
             goodsId: undefined,
             goodsName: undefined,
-            inGoodsStatus: undefined,
-            inGoodsPage: {}
+            inGoodsStatus: "1",
+            inGoodsPage: {},
+            dateIn: dateFormat("YYYY-mm-dd", new Date()),
         };
     }
 
@@ -69,6 +81,14 @@ class InGoodsManage extends Component {
         });
     };
 
+    handleChannelOrderCodeChange = (e) => {
+      this.setState({
+        channelOrderCode : e.target.value
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
+      });
+    };
+
     refresh = () => {
         this.handleSearch(this.state.page);
     };
@@ -78,7 +98,9 @@ class InGoodsManage extends Component {
             goodsId : this.state.goodsId,
             goodsName : this.state.goodsName,
             channelCode : this.state.channelCode,
+            channelOrderCode: this.state.channelOrderCode,
             inGoodsStatus : this.state.inGoodsStatus,
+            dateIn: this.state.dateIn,
             pageNum: page,
             pageSize : pageSize
         }).then((res) => {
@@ -124,6 +146,15 @@ class InGoodsManage extends Component {
           })
         },
         onCancel: () => {},
+      });
+    };
+
+    handleDateInChange = (date, dateString) => {
+      console.log("dateString", dateString);
+      this.setState({
+        dateIn : dateString
+      }, function () {
+        this.handleSearch(1, this.state.pageSize);
       });
     };
 
@@ -204,26 +235,31 @@ class InGoodsManage extends Component {
                         </Col>
                     </Row>
                     <Row style={{paddingTop: 24}}>
-                        <Col span={20}>
-                            <Input style={{width: 200, marginRight: 10}} placeholder="请输入商品名称" allowClear
-                                 value={this.state.goodsName} onChange={this.handleGoodsNameChange}/>
-                            <Select style={{width : 200, marginRight : 10}}  value={this.state.channelCode} allowClear={true}
-                                  onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
-                              {channelList}
-                            </Select>
-                            <Select style={{width : 200, marginRight : 10}}  value={this.state.inGoodsStatus} allowClear={true}
-                                    onChange = {this.handleStatusChange} placeholder="请选择状态">
-                              {inGoodsStatusList}
-                            </Select>
-                        </Col>
-                        <Col span={4} style={{textAlign: "right"}}>
-                            <InGoodsEditModal type="add"
-                                            item={undefined}
-                                            key={0}
-                                            channelList={channelList}
-                                            goodsList={goodsList}
-                                            refresh={this.refresh.bind(this)} />
-                        </Col>
+                      <Col span={21}>
+                        <Input style={{width : 200, marginRight : 10}} placeholder="请输入商品名称" allowClear
+                               value={this.state.goodsName} onChange={this.handleGoodsNameChange}/>
+                        <Input style={{width : 200, marginRight : 10}} placeholder="请输入渠道订单号" allowClear
+                               value={this.state.channelOrderCode} onChange={this.handleChannelOrderCodeChange}/>
+                        <Select style={{width : 200, marginRight : 10}}  value={this.state.channelCode} allowClear={true}
+                                onChange = {this.handleChannelCodeChange} placeholder="请选择渠道">
+                          {channelList}
+                        </Select>
+                        <Select style={{width : 200, marginRight : 10}}  value={this.state.inGoodsStatus} allowClear={true}
+                                onChange = {this.handleStatusChange} placeholder="请选择状态">
+                          {inGoodsStatusList}
+                        </Select>
+                        <DatePicker style={{width: 200, marginRight: 10}} onChange={this.handleDateInChange} format="YYYY-MM-DD"
+                                    defaultValue = {moment(this.state.dateIn, "YYYY-MM-DD")}
+                                    placeholder="请选择入库时间" locale={locale}/>
+                      </Col>
+                      <Col span={3} style={{textAlign: "right"}}>
+                        <InGoodsEditModal type="add"
+                                          item={undefined}
+                                          key={0}
+                                          channelList={channelList}
+                                          goodsList={goodsList}
+                                          refresh={this.refresh.bind(this)} />
+                      </Col>
                     </Row>
                     <Row style={{paddingTop: 16}}>
                       <Col span={24}>
