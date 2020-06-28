@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import "../index.less";
 import zhCN from 'antd/lib/locale-provider/zh_CN';
 import {Statistic, Card, Icon, Col, Row, Table, Select, notification, ConfigProvider, Modal, Form} from "antd";
-import InGoodsAPI from "../../components/api/InGoodsAPI";
+import StatisticsAPI from "../../components/api/StatisticsAPI";
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import moment from 'moment';
 import {dateFormat} from '../../components/CommonFunction'
@@ -11,18 +11,18 @@ class Dashboard extends Component {
     constructor(props) {
       super(props);
         this.state = {
+          statisticsData: {}
         };
     }
 
     componentDidMount() {
-/*      GoodsAPI.getGoodsList().then((res) => {
+      StatisticsAPI.getDashboardStatistics().then((res) => {
         if (res.data.success) {
           this.setState({
-            goodsList : res.data.data
+            statisticsData : res.data.data
           });
         }
       });
-      this.handleSearch(this.state.page, this.state.pageSize);*/
     }
 
 
@@ -36,7 +36,7 @@ class Dashboard extends Component {
                           <Card bordered={false}>
                             <Statistic
                               title="今日单数"
-                              value={11}
+                              value={this.state.statisticsData.todayOrderNum}
                               precision={0}
                             />
                           </Card>
@@ -45,7 +45,7 @@ class Dashboard extends Component {
                           <Card bordered={false}>
                             <Statistic
                               title="今日销售"
-                              value={9.3}
+                              value={this.state.statisticsData.todaySalesVolume}
                               precision={2}
                               prefix={"￥"}
                             />
@@ -55,7 +55,7 @@ class Dashboard extends Component {
                           <Card>
                             <Statistic
                               title="今日收入"
-                              value={9.3}
+                              value={this.state.statisticsData.todayProfit}
                               precision={2}
                               prefix={"￥"}
                             />
@@ -67,7 +67,7 @@ class Dashboard extends Component {
                       <Card bordered={false}>
                         <Statistic
                           title="昨日单数"
-                          value={11}
+                          value={this.state.statisticsData.yesterdayOrderNum}
                           precision={0}
                         />
                       </Card>
@@ -76,7 +76,7 @@ class Dashboard extends Component {
                       <Card bordered={false}>
                         <Statistic
                           title="昨日销售"
-                          value={9.3}
+                          value={this.state.statisticsData.yesterdaySalesVolume}
                           precision={2}
                           prefix={"￥"}
                         />
@@ -86,7 +86,7 @@ class Dashboard extends Component {
                       <Card bordered={false}>
                         <Statistic
                           title="昨日收入"
-                          value={9.3}
+                          value={this.state.statisticsData.yesterdayProfit}
                           precision={2}
                           prefix={"￥"}
                         />
