@@ -32,6 +32,10 @@ const CustomerAPI = {
       return axios.get(`${SERVER_URL}/customer/getCustomerList`)
     },
 
+    getCustomerListLikeName : (param) => {
+      return axios.get(`${SERVER_URL}/customer/getCustomerListLikeName/${param}`)
+    },
+
     getProvince : () => {
       return axios.get(`${SERVER_URL}/area/getProvince`)
     },
@@ -42,6 +46,13 @@ const CustomerAPI = {
 
     getDistrictsByCityCode : (param) => {
       return axios.get(`${SERVER_URL}/area/getDistrictsByCityCode/${param}`)
+    },
+
+    updateCustomerFollowStatus : (param) => {
+      return axios.post(
+        `${SERVER_URL}/customer/updateCustomerFollowStatus`,
+        queryString.stringify(param),
+      )
     },
 
 };

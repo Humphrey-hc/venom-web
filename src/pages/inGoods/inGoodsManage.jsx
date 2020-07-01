@@ -173,7 +173,7 @@ class InGoodsManage extends Component {
         let inGoodsPage = this.state.inGoodsPage;
 
         let columns = [
-            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "150px"},
+            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "200px"},
             { title : "渠道订单号", key : "channelOrderNo", dataIndex : "channelOrderNo", width: "150px"},
             { title : "渠道运单号", key : "channelWaybillNo", dataIndex : "channelWaybillNo", width: "150px"},
             { title : "渠道", key : "channelName", dataIndex : "channelName", width: "150px"},

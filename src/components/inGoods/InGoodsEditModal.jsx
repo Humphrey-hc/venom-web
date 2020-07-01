@@ -30,7 +30,8 @@ class InGoodsEditModal extends Component {
             this.setState({inGoodsVO : deepClone(this.props.item),});
         } else {
             this.state.inGoodsVO = {
-              channelWaybillNo: "暂无"
+              channelWaybillNo: "暂无",
+              dateStorage: moment(dateFormat("YYYY/mm/dd", new Date()), "YYYY-MM-DD")
             };
         }
         this.setState({modalVisible : true});
@@ -144,8 +145,7 @@ class InGoodsEditModal extends Component {
                 </FormItem>
                 <FormItem label="采购时间" {...formItemLayout} required={true}>
                   <DatePicker style={{width : 500}} onChange={this.handleDateStorageChange} format="YYYY-MM-DD"
-                              value = {this.state.inGoodsVO.dateStorage ?
-                                moment(this.state.inGoodsVO.dateStorage, "YYYY-MM-DD") : null}
+                              value = {this.state.inGoodsVO.dateStorage ? moment(this.state.inGoodsVO.dateStorage, "YYYY-MM-DD") : null}
                               placeholder="请选择采购时间" locale={locale}/>
                 </FormItem>
                <FormItem label="数量" {...formItemLayout} required={true}>

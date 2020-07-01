@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import { Modal, Form, Input, Button, notification, Select, InputNumber} from 'antd';
-import {commonMessage, deepClone} from "../CommonFunction";
+import {commonMessage, dateFormat, deepClone} from "../CommonFunction";
 import CustomerAPI from "../api/CustomerAPI";
 
 const formItemLayout = {
@@ -26,15 +26,7 @@ class CustomerEditModal extends Component {
         }
     }
 
-    componentDidMount() {
-      CustomerAPI.getProvince().then((res) => {
-        if (res.data.success) {
-          this.setState({
-            provinceList : res.data.data
-          });
-        }
-      });
-    }
+    componentDidMount() {}
 
     show = () => {
         if (this.props.item) {
@@ -59,7 +51,9 @@ class CustomerEditModal extends Component {
               customerVO : deepClone(this.props.item),
             });
         } else {
-            this.state.customerVO = {};
+            this.state.customerVO = {
+              weChatName: dateFormat("YYYYmmdd", new Date())+"-"
+            };
         }
         this.setState({modalVisible : true});
     };
@@ -175,10 +169,6 @@ class CustomerEditModal extends Component {
 
     render() {
 
-        let provinceList = this.state.provinceList.map((province) => {
-          return (<Option value={province.code} key={province.code}>{province.name}</Option>)
-        });
-
         let cityList = this.state.cityList.map((city) => {
           return (<Option value={city.code} key={city.code}>{city.name}</Option>)
         });
@@ -226,7 +216,7 @@ class CustomerEditModal extends Component {
                             }
                             onChange = {this.handleProvinceChange}
                             placeholder="请选择省份">
-                        {provinceList}
+                        {this.props.provinceList}
                     </Select>
                 </FormItem>
                 <FormItem label="城市" {...formItemLayout} required={true}>

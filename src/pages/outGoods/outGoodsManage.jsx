@@ -40,7 +40,6 @@ class OutGoodsManage extends Component {
             remark: undefined,
             outGoodsPage: {},
             goodsList: [],
-            customerList: []
         };
     }
 
@@ -49,13 +48,6 @@ class OutGoodsManage extends Component {
         if (res.data.success) {
           this.setState({
             goodsList : res.data.data
-          });
-        }
-      });
-      CustomerAPI.getCustomerList().then((res) => {
-        if (res.data.success) {
-          this.setState({
-            customerList : res.data.data
           });
         }
       });
@@ -216,9 +208,6 @@ class OutGoodsManage extends Component {
         let channelList = this.state.channelList.map((channel) => {
             return (<Option value={channel.code} key={channel.code}>{channel.name}</Option>)
         });
-        let customerList = this.state.customerList.map((customer) => {
-          return (<Option value={customer.id} key={customer.id}>{customer.id + "-" +customer.name}</Option>)
-        });
         let statusList = this.state.statusList.map((status) => {
           return (<Option value={status.code} key={status.code}>{status.name}</Option>)
         });
@@ -257,7 +246,7 @@ class OutGoodsManage extends Component {
                     return (
                         <div>
                             <div>
-                                <OutGoodsEditModal type="edit" item={record} key={record.id} customerList={customerList} goodsList={goodsList}
+                                <OutGoodsEditModal type="edit" item={record} key={record.id} goodsList={goodsList}
                                                   refresh={this.refresh.bind(this)} />
                                 &nbsp;&nbsp;|&nbsp;&nbsp;
                                 <a onClick={() => {this.handleDelete(record.id)}}>删除</a><br/>
@@ -333,7 +322,6 @@ class OutGoodsManage extends Component {
                             <OutGoodsEditModal type="add"
                                             item={undefined}
                                             key={0}
-                                            customerList={customerList}
                                             goodsList={goodsList}
                                             refresh={this.refresh.bind(this)} />
                         </Col>

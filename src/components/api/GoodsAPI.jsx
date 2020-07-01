@@ -14,6 +14,10 @@ const GoodsAPI = {
         return axios.delete(`${SERVER_URL}/goods/deleteGoods/${param}`)
     },
 
+    getGoodsById : (param) => {
+      return axios.get(`${SERVER_URL}/goods/getGoodsById/${param}`)
+    },
+
     deleteById : (param) => {
         return axios.post(
             `${SERVER_URL}/api/ConsultationManageAPI/deleteById.json`,

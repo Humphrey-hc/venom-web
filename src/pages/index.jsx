@@ -88,7 +88,7 @@ class Index extends Component {
                 }}
               >
                 {this.state.menuKey ?  content :
-                  <div style={{ background: '#f0f2f5', padding: '30px', minHeight: "100vh"}}>
+                  <div style={{ background: '#f1f2f5', padding: '30px', minHeight: "100vh"}}>
                     <Dashboard/>
                   </div>
                 }

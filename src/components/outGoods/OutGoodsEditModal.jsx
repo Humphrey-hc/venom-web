@@ -2,6 +2,8 @@ import React, {Component} from 'react';
 import { Modal, Form, Input, Button, notification, Select, InputNumber} from 'antd';
 import {commonMessage, deepClone} from "../CommonFunction";
 import OutGoodsAPI from "../api/OutGoodsAPI";
+import CustomerAPI from "../api/CustomerAPI";
+import GoodsAPI from "../api/GoodsAPI";
 
 const formItemLayout = {
     labelCol: {span: 4},
@@ -20,6 +22,7 @@ class OutGoodsEditModal extends Component {
             channelList: [],
             tagId: undefined,
             parentTagId: undefined,
+            customerList: []
         }
     }
 
@@ -89,8 +92,17 @@ class OutGoodsEditModal extends Component {
     };
 
     handleGoodsIdChange = (value) => {
-      this.state.outGoodsVO.goodsId = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+      // 请求商品接口
+      GoodsAPI.getGoodsById(value).then((res) => {
+        if (res.data.success) {
+          this.state.outGoodsVO.goodsId = value;
+          this.state.outGoodsVO.actualSellingPrice = res.data.data.guideSellingPrice;
+          this.state.outGoodsVO.actualBuyingPrice = res.data.data.buyingPrice;
+          this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+        }
+      });
+/*      this.state.outGoodsVO.goodsId = value;
+      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});*/
     };
 
 
@@ -138,7 +150,23 @@ class OutGoodsEditModal extends Component {
         });
     };
 
+    handleCustomerNameSearch = (value) => {
+      if (value !== undefined || value !== '') {
+        CustomerAPI.getCustomerListLikeName(value).then((res) => {
+          if (res.data.success) {
+            this.setState({
+              customerList : res.data.data
+            });
+          }
+        });
+      }
+    };
+
     render() {
+
+        let customerList = this.state.customerList.map((customer) => {
+          return (<Option value={customer.id} key={customer.id}>{customer.name  + "-" + customer.provinceName}</Option>)
+        });
 
         let type = this.props.type;
         let clickEle = null;
@@ -171,12 +199,12 @@ class OutGoodsEditModal extends Component {
                     <Select style={{width : 500, marginRight : 10}}
                             value={this.state.outGoodsVO.customerId}
                             allowClear={true} showSearch required={true}
-                            onSearch={this.handleGoodsIdSearch}
+                            onSearch={this.handleCustomerNameSearch}
                             filterOption={(input, option) =>
                               option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
                             }
                             onChange = {this.handleCustomerIdChange} placeholder="请输入客户ID">
-                        {this.props.customerList}
+                        {customerList}
                     </Select>
                 </FormItem>
                 <FormItem label="售卖数量" {...formItemLayout} required={true}>
