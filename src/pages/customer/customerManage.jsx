@@ -145,11 +145,11 @@ class CustomerManage extends Component {
               notification.success({message: "操作成功", description: "修改成功"});
               setTimeout(() => {
                 this.handleSearch(this.state.page, this.state.pageSize);
-                this.setState({remark: undefined});
+                this.setState({followStatus: undefined});
               });
             } else {
               notification.error({message: "操作失败", description: "修改失败"});
-              this.setState({remark: undefined});
+              this.setState({followStatus: undefined});
             }
           })
         },

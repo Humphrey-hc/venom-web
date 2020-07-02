@@ -29,10 +29,9 @@ class InGoodsEditModal extends Component {
         if (this.props.item) {
             this.setState({inGoodsVO : deepClone(this.props.item),});
         } else {
-            this.state.inGoodsVO = {
-              channelWaybillNo: "暂无",
-              dateStorage: moment(dateFormat("YYYY/mm/dd", new Date()), "YYYY-MM-DD")
-            };
+            this.state.inGoodsVO.channelWaybillNo = "暂无";
+            this.state.inGoodsVO.dateStorage = dateFormat("YYYY/mm/dd", new Date());
+            this.setState({inGoodsVO : deepClone(this.state.inGoodsVO)});
         }
         this.setState({modalVisible : true});
     };
