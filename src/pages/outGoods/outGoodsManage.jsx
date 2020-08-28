@@ -230,8 +230,8 @@ class OutGoodsManage extends Component {
                   }
                 }
             },
-            { title : "客户名称", key : "customerName", dataIndex : "customerName", width: "150px"},
-            { title : "渠道", key : "channelName", dataIndex : "channelName", width: "150px"},
+            { title : "客户名称", key : "customerName", dataIndex : "customerName", width: "200px"},
+            { title : "渠道", key : "channelName", dataIndex : "channelName", width: "100px"},
             { title : "邮费", key : "actualPostage", dataIndex : "actualPostage", width: "100px"},
             { title : "实际售价", key : "actualSellingPrice", dataIndex : "actualSellingPrice", width: "100px"},
             { title : "实际成本", key : "actualBuyingPrice", dataIndex : "actualBuyingPrice", width: "100px"},

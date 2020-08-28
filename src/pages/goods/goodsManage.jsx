@@ -92,7 +92,7 @@ class GoodsManage extends Component {
         let goodsPage = this.state.goodsPage;
 
         let columns = [
-            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "250px"},
+            { title : "商品名", key : "goodsName", dataIndex : "goodsName", width: "300px"},
             { title : "渠道", key : "channelName", dataIndex : "channelName", width: "200px"},
             { title : "库存", key : "stockNum", dataIndex : "stockNum", width: "80px", align:"center",
               render: (text, record) => {

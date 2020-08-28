@@ -7,6 +7,10 @@ const StatisticsAPI = {
       return axios.get(`${SERVER_URL}/statistics/getDashboardStatistics`)
     },
 
+    getThisMonthStatistics : (param) => {
+      return axios.get(`${SERVER_URL}/statistics/getThisMonthStatistics`)
+    },
+
 };
 
 export default StatisticsAPI;
