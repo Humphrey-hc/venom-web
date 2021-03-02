@@ -37,6 +37,7 @@ class OutGoodsManage extends Component {
         { code: '1', name: '严选内购' },
         { code: '2', name: '大萌严选' },
         { code: '3', name: '其他' },
+        { code: '4', name: '自提采购' },
       ],
       statusList: [
         { code: 1, name: '未发货' },
