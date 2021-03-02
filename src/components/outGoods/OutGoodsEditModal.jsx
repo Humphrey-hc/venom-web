@@ -1,245 +1,338 @@
-import React, {Component} from 'react';
-import { Modal, Form, Input, Button, notification, Select, InputNumber} from 'antd';
-import {commonMessage, deepClone} from "../CommonFunction";
-import OutGoodsAPI from "../api/OutGoodsAPI";
-import CustomerAPI from "../api/CustomerAPI";
-import GoodsAPI from "../api/GoodsAPI";
+import React, { Component } from 'react';
+import {
+  Modal,
+  Form,
+  DatePicker,
+  Button,
+  notification,
+  Select,
+  InputNumber,
+} from 'antd';
+import { commonMessage, deepClone } from '../CommonFunction';
+import OutGoodsAPI from '../api/OutGoodsAPI';
+import CustomerAPI from '../api/CustomerAPI';
+import GoodsAPI from '../api/GoodsAPI';
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import moment from 'moment';
+import 'moment/locale/zh-cn';
 
 const formItemLayout = {
-    labelCol: {span: 4},
-    wrapperCol: {span: 20},
+  labelCol: { span: 4 },
+  wrapperCol: { span: 20 },
 };
 const FormItem = Form.Item;
 
 class OutGoodsEditModal extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      modalVisible: false,
+      disable: false,
+      outGoodsVO: {},
+      channelList: [],
+      tagId: undefined,
+      parentTagId: undefined,
+      customerList: [],
+    };
+  }
 
-    constructor(props) {
-        super(props);
-        this.state = {
-            modalVisible : false,
-            disable : false,
-            outGoodsVO: {},
-            channelList: [],
-            tagId: undefined,
-            parentTagId: undefined,
-            customerList: []
-        }
+  show = () => {
+    if (this.props.item) {
+      this.setState({ outGoodsVO: deepClone(this.props.item) });
+    } else {
+      this.state.outGoodsVO = {
+        actualPostage: 0,
+        brokerage: 0,
+        num: 1,
+        preDateDeliver: moment(new Date(), 'YYYY-MM-DD'),
+      };
+    }
+    this.setState({ modalVisible: true });
+  };
+
+  onOk = () => {
+    if (this.state.disable) {
+      return;
     }
 
-    show = () => {
-        if (this.props.item) {
-            this.setState({outGoodsVO : deepClone(this.props.item),});
-        } else {
-            this.state.outGoodsVO = {
-              actualPostage: 0,
-              brokerage: 0,
-              num: 1
-            };
-        }
-        this.setState({modalVisible : true});
-    };
+    //校验
+    if (!this.state.outGoodsVO.goodsId) {
+      notification.error({ message: '保存失败', description: '商品必选' });
+      return;
+    }
+    if (!this.state.outGoodsVO.customerId) {
+      notification.error({ message: '保存失败', description: '客户必选' });
+      return;
+    }
+    if (!this.state.outGoodsVO.actualSellingPrice) {
+      notification.error({ message: '保存失败', description: '实际销售必填' });
+      return;
+    }
+    if (!this.state.outGoodsVO.actualBuyingPrice) {
+      notification.error({ message: '保存失败', description: '实际成本必填' });
+      return;
+    }
+    if (this.state.outGoodsVO.actualPostage === undefined) {
+      notification.error({ message: '保存失败', description: '实际邮费必填' });
+      return;
+    }
+    if (this.state.outGoodsVO.brokerage === undefined) {
+      notification.error({ message: '保存失败', description: '佣金必填' });
+      return;
+    }
+    if (!this.state.outGoodsVO.num) {
+      notification.error({ message: '保存失败', description: '销售数量必填' });
+      return;
+    }
 
-    onOk = () => {
-        if (this.state.disable) {
-            return
-        }
+    this.setState({ disable: true });
 
-        //校验
-        if (!this.state.outGoodsVO.goodsId) {
-            notification.error({message : "保存失败", description : "商品必选"});
-            return;
-        }
-        if (!this.state.outGoodsVO.customerId) {
-            notification.error({message : "保存失败", description : "客户必选"});
-            return;
-        }
-        if (!this.state.outGoodsVO.actualSellingPrice) {
-          notification.error({message : "保存失败", description : "实际销售必填"});
-          return;
-        }
-        if (!this.state.outGoodsVO.actualBuyingPrice) {
-          notification.error({message : "保存失败", description : "实际成本必填"});
-          return;
-        }
-        if (this.state.outGoodsVO.actualPostage === undefined) {
-          notification.error({message : "保存失败", description : "实际邮费必填"});
-          return;
-        }
-        if (this.state.outGoodsVO.brokerage === undefined) {
-          notification.error({message : "保存失败", description : "佣金必填"});
-          return;
-        }
-        if (!this.state.outGoodsVO.num) {
-          notification.error({message : "保存失败", description : "销售数量必填"});
-          return;
-        }
+    OutGoodsAPI.saveOrUpdateOutGoods(this.state.outGoodsVO).then(res => {
+      let flag = commonMessage(res);
+      this.setState({ disable: false });
+      if (flag) {
+        this.setState({ modalVisible: false });
+        this.props.refresh();
+      }
+    });
+  };
 
-        this.setState({disable:true});
+  onCancel = () => {
+    this.setState({ modalVisible: false });
+  };
 
-      OutGoodsAPI.saveOrUpdateOutGoods(this.state.outGoodsVO)
-        .then((res) => {
-            let flag = commonMessage(res);
-            this.setState({disable:false});
-            if (flag) {
-                this.setState({modalVisible : false});
-                this.props.refresh();
-            }
-        });
-    };
+  handleGoodsIdChange = value => {
+    // 请求商品接口
+    GoodsAPI.getGoodsById(value).then(res => {
+      if (res.data.success) {
+        this.state.outGoodsVO.goodsId = value;
+        this.state.outGoodsVO.actualSellingPrice =
+          res.data.data.guideSellingPrice;
+        this.state.outGoodsVO.actualBuyingPrice = res.data.data.buyingPrice;
+        this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+      }
+    });
+    /*      this.state.outGoodsVO.goodsId = value;
+      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});*/
+  };
 
-    onCancel = () => {
-        this.setState({modalVisible : false});
-    };
+  handleCustomerIdChange = value => {
+    this.state.outGoodsVO.customerId = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
 
-    handleGoodsIdChange = (value) => {
-      // 请求商品接口
-      GoodsAPI.getGoodsById(value).then((res) => {
+  handleActualSellingPriceChange = value => {
+    this.state.outGoodsVO.actualSellingPrice = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  handleActualPostageChange = value => {
+    this.state.outGoodsVO.actualPostage = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  handleActualBuyingPriceChange = value => {
+    this.state.outGoodsVO.actualBuyingPrice = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  handleBrokerageChange = value => {
+    this.state.outGoodsVO.brokerage = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  handleNumChange = value => {
+    this.state.outGoodsVO.num = value;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  handleCalculatePostage = () => {
+    OutGoodsAPI.calculatePostage({
+      goodsId: this.state.outGoodsVO.goodsId,
+      customerId: this.state.outGoodsVO.customerId,
+      num: this.state.outGoodsVO.num,
+    }).then(res => {
+      if (res.data.success) {
+        this.state.outGoodsVO.actualPostage = res.data.data;
+        this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+      }
+    });
+  };
+
+  handleCustomerNameSearch = value => {
+    if (value !== undefined || value !== '') {
+      CustomerAPI.getCustomerListLikeName(value).then(res => {
         if (res.data.success) {
-          this.state.outGoodsVO.goodsId = value;
-          this.state.outGoodsVO.actualSellingPrice = res.data.data.guideSellingPrice;
-          this.state.outGoodsVO.actualBuyingPrice = res.data.data.buyingPrice;
-          this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
+          this.setState({
+            customerList: res.data.data,
+          });
         }
       });
-/*      this.state.outGoodsVO.goodsId = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});*/
-    };
-
-
-    handleCustomerIdChange = (value) => {
-      this.state.outGoodsVO.customerId = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-
-    handleActualSellingPriceChange = (value) => {
-      this.state.outGoodsVO.actualSellingPrice = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-    handleActualPostageChange = (value) => {
-      this.state.outGoodsVO.actualPostage = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-    handleActualBuyingPriceChange = (value) => {
-      this.state.outGoodsVO.actualBuyingPrice = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-    handleBrokerageChange = (value) => {
-      this.state.outGoodsVO.brokerage = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-    handleNumChange = (value) => {
-      this.state.outGoodsVO.num = value;
-      this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-    };
-
-    handleCalculatePostage = () => {
-      OutGoodsAPI.calculatePostage({
-        goodsId : this.state.outGoodsVO.goodsId,
-        customerId : this.state.outGoodsVO.customerId,
-        num : this.state.outGoodsVO.num,
-      }).then((res) => {
-          if (res.data.success) {
-            this.state.outGoodsVO.actualPostage = res.data.data;
-            this.setState({outGoodsVO : deepClone(this.state.outGoodsVO)});
-          }
-        });
-    };
-
-    handleCustomerNameSearch = (value) => {
-      if (value !== undefined || value !== '') {
-        CustomerAPI.getCustomerListLikeName(value).then((res) => {
-          if (res.data.success) {
-            this.setState({
-              customerList : res.data.data
-            });
-          }
-        });
-      }
-    };
-
-    render() {
-
-        let customerList = this.state.customerList.map((customer) => {
-          return (<Option value={customer.id} key={customer.id}>{customer.name  + "-" + customer.provinceName}</Option>)
-        });
-
-        let type = this.props.type;
-        let clickEle = null;
-        let title = null;
-        if (type === "add") {
-            clickEle = (<Button type="primary" onClick={this.show}>添加</Button>);
-            title = "添加出库"
-        } else {
-            clickEle = (<a onClick={this.show}>编辑</a>);
-            title = "编辑出库"
-        }
-
-        return (<span>
-            {clickEle}
-            <Modal title={title} width={850} visible={this.state.modalVisible}
-                   onOk={this.onOk} onCancel={this.onCancel} key={this.props.key}>
-                <FormItem label="商品ID" {...formItemLayout} required={true}>
-                    <Select style={{width : 500, marginRight : 10}}
-                            value={this.state.outGoodsVO.goodsId}
-                            allowClear={true} showSearch required={true}
-                            onSearch={this.handleGoodsIdSearch}
-                            filterOption={(input, option) =>
-                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onChange = {this.handleGoodsIdChange} placeholder="请输入商品ID">
-                        {this.props.goodsList}
-                    </Select>
-                </FormItem>
-                <FormItem label="客户ID" {...formItemLayout} required={true}>
-                    <Select style={{width : 500, marginRight : 10}}
-                            value={this.state.outGoodsVO.customerId}
-                            allowClear={true} showSearch required={true}
-                            onSearch={this.handleCustomerNameSearch}
-                            filterOption={(input, option) =>
-                              option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                            }
-                            onChange = {this.handleCustomerIdChange} placeholder="请输入客户ID">
-                        {customerList}
-                    </Select>
-                </FormItem>
-                <FormItem label="售卖数量" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {0} value={this.state.outGoodsVO.num}
-                                 onChange={this.handleNumChange} placeholder="请输入售卖数量"/>
-                </FormItem>
-                <FormItem label="实际销售价格(元)" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualSellingPrice}
-                           onChange={this.handleActualSellingPriceChange} placeholder="请输入实际销售价格"/>
-                </FormItem>
-                <FormItem label="实际邮费(元)" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualPostage}
-                                 onChange={this.handleActualPostageChange} placeholder="请输入实际销售价格"/>
-                    &nbsp;&nbsp;&nbsp;&nbsp;
-                    <Button type="primary"
-                            onClick={this.handleCalculatePostage}
-                            disabled={
-                              this.state.outGoodsVO.customerId === undefined ||
-                              this.state.outGoodsVO.goodsId === undefined ||
-                              this.state.outGoodsVO.num === undefined}
-                    >
-                      计算
-                    </Button>
-                </FormItem>
-               <FormItem label="实际成本价格(元)" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.actualBuyingPrice}
-                           onChange={this.handleActualBuyingPriceChange} placeholder="请输入实际成本价格"/>
-                </FormItem>
-               <FormItem label="佣金(元)" {...formItemLayout} required={true}>
-                    <InputNumber style={{width : 500}} min={0} precision = {2} value={this.state.outGoodsVO.brokerage}
-                           onChange={this.handleBrokerageChange} placeholder="请输入佣金"/>
-                </FormItem>
-            </Modal>
-        </span>)
     }
+  };
+
+  handlePreDateDeliverChange = (date, dateString) => {
+    this.state.outGoodsVO.preDateDeliver = dateString;
+    this.setState({ outGoodsVO: deepClone(this.state.outGoodsVO) });
+  };
+
+  render() {
+    let customerList = this.state.customerList.map(customer => {
+      return (
+        <Option value={customer.id} key={customer.id}>
+          {customer.name + '-' + customer.provinceName}
+        </Option>
+      );
+    });
+
+    let type = this.props.type;
+    let clickEle = null;
+    let title = null;
+    if (type === 'add') {
+      clickEle = (
+        <Button type="primary" onClick={this.show}>
+          添加
+        </Button>
+      );
+      title = '添加出库';
+    } else {
+      clickEle = <a onClick={this.show}>编辑</a>;
+      title = '编辑出库';
+    }
+
+    return (
+      <span>
+        {clickEle}
+        <Modal
+          title={title}
+          width={850}
+          visible={this.state.modalVisible}
+          onOk={this.onOk}
+          onCancel={this.onCancel}
+          key={this.props.key}
+        >
+          <FormItem label="商品ID" {...formItemLayout} required={true}>
+            <Select
+              style={{ width: 500, marginRight: 10 }}
+              value={this.state.outGoodsVO.goodsId}
+              allowClear={true}
+              showSearch
+              required={true}
+              onSearch={this.handleGoodsIdSearch}
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              onChange={this.handleGoodsIdChange}
+              placeholder="请输入商品ID"
+            >
+              {this.props.goodsList}
+            </Select>
+          </FormItem>
+          <FormItem label="客户ID" {...formItemLayout} required={true}>
+            <Select
+              style={{ width: 500, marginRight: 10 }}
+              value={this.state.outGoodsVO.customerId}
+              allowClear={true}
+              showSearch
+              required={true}
+              onSearch={this.handleCustomerNameSearch}
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+              onChange={this.handleCustomerIdChange}
+              placeholder="请输入客户ID"
+            >
+              {customerList}
+            </Select>
+          </FormItem>
+          <FormItem label="售卖数量" {...formItemLayout} required={true}>
+            <InputNumber
+              style={{ width: 500 }}
+              min={0}
+              precision={0}
+              value={this.state.outGoodsVO.num}
+              onChange={this.handleNumChange}
+              placeholder="请输入售卖数量"
+            />
+          </FormItem>
+          <FormItem
+            label="实际销售价格(元)"
+            {...formItemLayout}
+            required={true}
+          >
+            <InputNumber
+              style={{ width: 500 }}
+              min={0}
+              precision={2}
+              value={this.state.outGoodsVO.actualSellingPrice}
+              onChange={this.handleActualSellingPriceChange}
+              placeholder="请输入实际销售价格"
+            />
+          </FormItem>
+          <FormItem label="实际邮费(元)" {...formItemLayout} required={true}>
+            <InputNumber
+              style={{ width: 500 }}
+              min={0}
+              precision={2}
+              value={this.state.outGoodsVO.actualPostage}
+              onChange={this.handleActualPostageChange}
+              placeholder="请输入实际销售价格"
+            />
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <Button
+              type="primary"
+              onClick={this.handleCalculatePostage}
+              disabled={
+                this.state.outGoodsVO.customerId === undefined ||
+                this.state.outGoodsVO.goodsId === undefined ||
+                this.state.outGoodsVO.num === undefined
+              }
+            >
+              计算
+            </Button>
+          </FormItem>
+          <FormItem
+            label="实际成本价格(元)"
+            {...formItemLayout}
+            required={true}
+          >
+            <InputNumber
+              style={{ width: 500 }}
+              min={0}
+              precision={2}
+              value={this.state.outGoodsVO.actualBuyingPrice}
+              onChange={this.handleActualBuyingPriceChange}
+              placeholder="请输入实际成本价格"
+            />
+          </FormItem>
+          <FormItem label="佣金(元)" {...formItemLayout} required={true}>
+            <InputNumber
+              style={{ width: 500 }}
+              min={0}
+              precision={2}
+              value={this.state.outGoodsVO.brokerage}
+              onChange={this.handleBrokerageChange}
+              placeholder="请输入佣金"
+            />
+          </FormItem>
+          <FormItem label="预计发货时间" {...formItemLayout} required={true}>
+            <DatePicker
+              style={{ width: 500 }}
+              onChange={this.handlePreDateDeliverChange}
+              format="YYYY-MM-DD"
+              value={
+                this.state.outGoodsVO.preDateDeliver
+                  ? moment(this.state.outGoodsVO.preDateDeliver, 'YYYY-MM-DD')
+                  : null
+              }
+              placeholder="请选择预计发货时间"
+              locale={locale}
+            />
+          </FormItem>
+        </Modal>
+      </span>
+    );
+  }
 }
 
 export default OutGoodsEditModal;
